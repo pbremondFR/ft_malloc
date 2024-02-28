@@ -46,7 +46,7 @@ _COLOR_RESET	= \033[0m
 INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
 
-CC = gcc
+# CC = gcc
 CFLAGS := -Wall -Wextra $(INCLUDES)
 
 LIBFT := libft.a
@@ -107,7 +107,7 @@ $(TARGET): $(LIBFT_PATH)/$(LIBFT) $(MANDATORY_OBJ)
 	@$(CC) $(MANDATORY_OBJ) -o $(TARGET) $(LDFLAGS) $(LDLIBS)
 	@echo "$(_GREEN)DONE$(_COLOR_RESET)"
 
-$(TARGET_BONUS): $(LIBMLX_PATH)/$(LIBMLX) $(BONUS_OBJ)
+$(TARGET_BONUS): $(BONUS_OBJ)
 	@echo "$(_PURPLE)Linking $(TARGET_BONUS)$(_COLOR_RESET)"
 	@$(CC) $(BONUS_OBJ) -o $(TARGET_BONUS) $(LIBS)
 	@echo "$(_GREEN)DONE$(_COLOR_RESET)"
