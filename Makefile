@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/02/28 20:59:56 by pbremond         ###   ########.fr        #
+#    Updated: 2024/02/28 21:10:41 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,7 +59,7 @@ LDLIBS := -lft
 ifdef BUILD_DEBUG
 	OBJ_DIR := objs_debug
 	TGT_DIR := debug
-	CFLAGS += -g -fsanitize=address
+	CFLAGS += -g3 -Og -fsanitize=address -fno-omit-frame-pointer
 	LDFLAGS += -fsanitize=address
 else
 	OBJ_DIR := objs
