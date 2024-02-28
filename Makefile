@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/02/28 21:10:41 by pbremond         ###   ########.fr        #
+#    Updated: 2024/02/28 21:28:41 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,6 +61,7 @@ ifdef BUILD_DEBUG
 	TGT_DIR := debug
 	CFLAGS += -g3 -Og -fsanitize=address -fno-omit-frame-pointer
 	LDFLAGS += -fsanitize=address
+	LIBFT_BUILD_ARGS := BUILD_DEBUG=1
 else
 	OBJ_DIR := objs
 	TGT_DIR := release
@@ -132,7 +133,7 @@ $(TESTER_TARGET): $(LIBFT_PATH)/$(LIBFT) $(TEST_OBJ)
 
 $(LIBFT_PATH)/$(LIBFT):
 	@echo "$(_PURPLE)Making $(basename $(LIBFT))$(_COLOR_RESET)"
-	@make -C $(LIBFT_PATH)
+	@make -C $(LIBFT_PATH) $(LIBFT_BUILD_ARGS)
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
 	@echo "$(_BLUE)Compiling $(basename $(notdir $*.o)) $(_COLOR_RESET)"
