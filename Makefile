@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/02/28 02:49:50 by pbremond         ###   ########.fr        #
+#    Updated: 2024/02/28 20:59:56 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,14 +45,15 @@ _COLOR_RESET	= \033[0m
 # Folders
 INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
+TEST_DIR = tester
 
-# CC = gcc
-CFLAGS := -Wall -Wextra $(INCLUDES)
+CC = gcc
+CFLAGS := -Wall -Wextra -fno-builtin-malloc $(INCLUDES)
 
 LIBFT := libft.a
 LIBFT_PATH := libft
 
-LDFLAGS := -L./$(LIBFT_PATH)
+LDFLAGS := -L./$(LIBFT_PATH) -L.
 LDLIBS := -lft
 
 ifdef BUILD_DEBUG
@@ -71,7 +72,7 @@ endif
 # ============================================================================ #
 
 # Source files used in both mandatory and bonus parts
-SRC_COMMON =	test.c
+SRC_COMMON =	malloc.c calloc.c free.c realloc.c
 
 # ============================================================================ #
 # ============================================================================ #
@@ -94,23 +95,40 @@ BONUS_OBJ = $(subst $(SRC_DIR)/, $(OBJ_DIR)/, $(patsubst %.c, %.o, $(SRC_BONUS_P
 # ============================================================================ #
 # ============================================================================ #
 
-TARGET = $(TGT_DIR)/ft_malloc
-TARGET_BONUS = $(TGT_DIR)/ft_malloc_bonus
+TEST_SRC =	test.c
+TEST_SRC_PLUS_PATH = $(addprefix $(TEST_DIR)/, $(TEST_SRC))
+TEST_OBJ = $(subst $(TEST_DIR)/, $(OBJ_DIR)/, $(patsubst %.c, %.o, $(TEST_SRC_PLUS_PATH)))
 
-all: $(TARGET)
+# ============================================================================ #
+# ============================================================================ #
 
-bonus: $(TARGET_BONUS)
+HOSTTYPE ?= $(shell uname -m)_$(shell uname -s)
+
+TARGET = $(TGT_DIR)/libft_malloc_$(HOSTTYPE).so
+TARGET_BONUS = $(TGT_DIR)/libft_malloc_$(HOSTTYPE)_bonus.so
+
+TESTER_TARGET = $(TGT_DIR)/test_ft_malloc
+
+all: $(TARGET) $(TESTER_TARGET)
+
+bonus: $(TARGET_BONUS) $(TESTER_TARGET)
 
 $(TARGET): $(LIBFT_PATH)/$(LIBFT) $(MANDATORY_OBJ)
 	@echo "$(_PURPLE)Linking $(TARGET)$(_COLOR_RESET)"
 	@mkdir -p $(@D)
-	@$(CC) $(MANDATORY_OBJ) -o $(TARGET) $(LDFLAGS) $(LDLIBS)
-	@echo "$(_GREEN)DONE$(_COLOR_RESET)"
+	@$(CC) $(MANDATORY_OBJ) -shared -o $(TARGET) $(LDFLAGS) $(LDLIBS)
+	@ln -sf $(TARGET) ./libft_malloc.so
 
-$(TARGET_BONUS): $(BONUS_OBJ)
+$(TARGET_BONUS): $(LIBFT_PATH)/$(LIBFT) $(BONUS_OBJ)
 	@echo "$(_PURPLE)Linking $(TARGET_BONUS)$(_COLOR_RESET)"
-	@$(CC) $(BONUS_OBJ) -o $(TARGET_BONUS) $(LIBS)
-	@echo "$(_GREEN)DONE$(_COLOR_RESET)"
+	@mkdir -p $(@D)
+	@$(CC) $(BONUS_OBJ) -shared -o $(TARGET_BONUS) $(LDFLAGS) $(LDLIBS)
+	@ln -sf $(TARGET_BONUS) ./libft_malloc.so
+
+$(TESTER_TARGET): $(LIBFT_PATH)/$(LIBFT) $(TEST_OBJ)
+	@echo "$(_PURPLE)Linking $(TESTER_TARGET)$(_COLOR_RESET)"
+	@mkdir -p $(@D)
+	@$(CC) $(TEST_OBJ) -o $(TESTER_TARGET) $(LDFLAGS) $(LDLIBS) -lft_malloc
 
 $(LIBFT_PATH)/$(LIBFT):
 	@echo "$(_PURPLE)Making $(basename $(LIBFT))$(_COLOR_RESET)"
@@ -119,13 +137,18 @@ $(LIBFT_PATH)/$(LIBFT):
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
 	@echo "$(_BLUE)Compiling $(basename $(notdir $*.o)) $(_COLOR_RESET)"
 	@mkdir -p $(@D)
+	@$(CC) $(CFLAGS) $(CPPFLAGS) -fPIC -c $< -o $@
+
+$(OBJ_DIR)/%.o : $(TEST_DIR)/%.c
+	@echo "$(_BLUE)Compiling $(basename $(notdir $*.o)) $(_COLOR_RESET)"
+	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 re: fclean all
 
 fclean: clean
-	@echo "$(_RED)Deleting $(TARGET) & $(TARGET_BONUS)$(_COLOR_RESET)"
-	@rm -rf $(TARGET) $(TARGET_BONUS)
+	@echo "$(_RED)Deleting binaries$(_COLOR_RESET)"
+	@rm -rf $(TARGET) $(TARGET_BONUS) $(TESTER_TARGET)
 
 clean:
 	@echo "$(_RED)Cleaning object files$(_COLOR_RESET)"

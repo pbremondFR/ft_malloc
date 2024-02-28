@@ -2,3 +2,4 @@ objs
 objs_debug
 release
 debug
+*.so

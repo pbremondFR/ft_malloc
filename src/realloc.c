@@ -1,25 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   realloc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/28 02:29:26 by pbremond         ###   ########.fr       */
+/*   Created: 2024/02/28 17:50:53 by pbremond          #+#    #+#             */
+/*   Updated: 2024/02/28 17:52:52 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #include <libft.h>
-#include <stdio.h>
-#ifdef NDEBUG
-# define FOO "release"
-#else
-# define FOO "debug"
-#endif
+#include "malloc.h"
+#include <errno.h>
 
-int main()
+void	*REALLOC(void *ptr, size_t size)
 {
-	printf("Hello world! %s\n", FOO);
-	return 0;
+	(void)ptr, (void)size;
+	errno = ENOMEM;
+	return NULL;
 }
