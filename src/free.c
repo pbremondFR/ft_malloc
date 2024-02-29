@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/29 21:11:18 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/02/29 23:19:30 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,6 @@
 void	FREE(void *ptr)
 {
 	size_t *size = ptr - sizeof(size_t);
-	printf("Size: %zu\n", *size);
+	dbg_print("Size: %zu\n", *size);
 	munmap(size, *size);
 }

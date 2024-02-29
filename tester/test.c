@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/29 21:59:37 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/02/29 23:21:55 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,18 +41,18 @@ int main()
 {
 	int pagesize1 = getpagesize();
 	long pagesize2 = sysconf(_SC_PAGESIZE);
-	printf("Page size: %d, %ld\n", pagesize1, pagesize2);
+	dbg_print("Page size: %d, %ld\n", pagesize1, pagesize2);
 
 	const char msg[] = "Hello world!\n";
 	write(STDOUT_FILENO, msg, sizeof(msg));
 	char *test = MALLOC(sizeof(msg));
 	void *freeme = test;
 	strcpy(test, msg);
-	// printf("%s", test + 4096);
+	dbg_print("%s", test + 4096);
 	int i = 8;
 	while (i < 999999999)
 	{
-		printf("%d - %u\n", i++, *(test++));
+		dbg_print("%d - %u\n", i++, *(test++));
 		// write(STDOUT_FILENO, (test++) + '0', 1);
 	}
 	FREE(freeme);

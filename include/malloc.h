@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:18:42 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/29 15:18:10 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/02/29 23:34:56 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@
 # define SMALL_ALLOC_MAX	512
 # define TINY_ZONE_SIZE		ALIGN_TO(TINY_ALLOC_MAX * 100, PAGE_SIZE)
 # define SMALL_ZONE_SIZE	ALIGN_TO(SMALL_ALLOC_MAX * 100, PAGE_SIZE)
+
+# ifndef NDEBUG
+#  define dbg_print(...)		dprintf(2, __VA_ARGS__)
+# else
+#  define dbg_print(...)
+# endif
 
 /*
  * Use preproc defines to give a different name to these functions in debug.
