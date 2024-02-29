@@ -3,3 +3,4 @@ objs_debug
 release
 debug
 *.so
+.vscode

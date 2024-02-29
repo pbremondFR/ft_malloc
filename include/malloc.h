@@ -6,30 +6,48 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:18:42 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/28 19:33:42 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/02/29 15:18:10 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
+#ifndef MALLOC_H
+# define MALLOC_H
+# include <stddef.h>
+# include <stdalign.h>
+
+# define ALIGN_TO(x, size)	(((size_t)x + (size-1)) & ~(size-1))
+# define ALIGN(x)	 		ALIGN_TO(x, alignof(void*))
+
+# define PAGE_SIZE			getpagesize()
+# define TINY_ALLOC_MAX		128
+# define SMALL_ALLOC_MAX	512
+# define TINY_ZONE_SIZE		ALIGN_TO(TINY_ALLOC_MAX * 100, PAGE_SIZE)
+# define SMALL_ZONE_SIZE	ALIGN_TO(SMALL_ALLOC_MAX * 100, PAGE_SIZE)
 
 /*
  * Use preproc defines to give a different name to these functions in debug.
  * This allows comparing behaviour of "real" malloc with my own. Don't use
  * 'ft' prefix because of the stupid ft_calloc in libft.
 */
-#ifndef NDEBUG
-# define MALLOC		my_malloc
-# define CALLOC		my_calloc
-# define REALLOC	my_realloc
-# define FREE		my_free
-#else
-# define MALLOC		malloc
-# define CALLOC		calloc
-# define REALLOC	realloc
-# define FREE		free
-#endif
+# ifndef NDEBUG
+#  define MALLOC	my_malloc
+#  define CALLOC	my_calloc
+#  define REALLOC	my_realloc
+#  define FREE		my_free
+# else
+#  define MALLOC	malloc
+#  define CALLOC	calloc
+#  define REALLOC	realloc
+#  define FREE		free
+# endif
 
 void	*MALLOC(size_t size);
+// Implement calloc because it's required to correctly replace glibc's malloc:
+// https://www.gnu.org/software/libc/manual/html_node/Replacing-malloc.html
 void	*CALLOC(size_t nb_elem, size_t size);
 void	*REALLOC(void *ptr, size_t size);
 void	FREE(void *ptr);
+
+void	show_alloc_mem();
+
+#endif
