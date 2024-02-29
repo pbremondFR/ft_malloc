@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/29 16:19:05 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/02/29 21:59:37 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <stdbool.h>
 
 __attribute_maybe_unused__
 static void	do_static_asserts()
@@ -38,9 +39,22 @@ static void	do_static_asserts()
 
 int main()
 {
+	int pagesize1 = getpagesize();
+	long pagesize2 = sysconf(_SC_PAGESIZE);
+	printf("Page size: %d, %ld\n", pagesize1, pagesize2);
+
 	const char msg[] = "Hello world!\n";
 	write(STDOUT_FILENO, msg, sizeof(msg));
-	MALLOC(0);
-
+	char *test = MALLOC(sizeof(msg));
+	void *freeme = test;
+	strcpy(test, msg);
+	// printf("%s", test + 4096);
+	int i = 8;
+	while (i < 999999999)
+	{
+		printf("%d - %u\n", i++, *(test++));
+		// write(STDOUT_FILENO, (test++) + '0', 1);
+	}
+	FREE(freeme);
 	return 0;
 }

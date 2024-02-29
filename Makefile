@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/02/29 16:18:07 by pbremond         ###   ########.fr        #
+#    Updated: 2024/02/29 21:59:06 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,8 +47,8 @@ INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
 TEST_DIR = tester
 
-# CC = gcc
-CFLAGS := -Wall -Wextra -fno-builtin-malloc $(INCLUDES)
+CC = gcc
+CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc $(INCLUDES)
 
 LIBFT := libft.a
 LIBFT_PATH := libft
@@ -56,17 +56,23 @@ LIBFT_PATH := libft
 LDFLAGS := -L./$(LIBFT_PATH) -L.
 LDLIBS := -lft
 
+LIBFT_BUILD_ARGS := CFLAGS=-std=gnu17
+
 ifdef BUILD_DEBUG
 	OBJ_DIR := objs_debug
 	TGT_DIR := debug
-	CFLAGS += -g3 -Og -fsanitize=address -fno-omit-frame-pointer
-	LDFLAGS += -fsanitize=address
-	LIBFT_BUILD_ARGS := BUILD_DEBUG=1
+	CFLAGS += -g3 -Og -fno-omit-frame-pointer
+	LIBFT_BUILD_ARGS += BUILD_DEBUG=1
 else
 	OBJ_DIR := objs
 	TGT_DIR := release
 	CFLAGS += -O3 -Werror
 	CPPFLAGS += -DNDEBUG
+endif
+
+ifndef VALGRIND
+	CFLAGS += -fsanitize=address
+	LDFLAGS += -fsanitize=address
 endif
 
 # ============================================================================ #
