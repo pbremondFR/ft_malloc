@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/29 23:21:55 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/01 00:33:11 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,22 +39,19 @@ static void	do_static_asserts()
 
 int main()
 {
-	int pagesize1 = getpagesize();
-	long pagesize2 = sysconf(_SC_PAGESIZE);
-	dbg_print("Page size: %d, %ld\n", pagesize1, pagesize2);
+	dbg_print("Page size: %d, %ld\n", getpagesize(), sysconf(_SC_PAGESIZE));
 
 	const char msg[] = "Hello world!\n";
 	write(STDOUT_FILENO, msg, sizeof(msg));
 	char *test = MALLOC(sizeof(msg));
 	void *freeme = test;
 	strcpy(test, msg);
-	dbg_print("%s", test + 4096);
+	dbg_print("%s", test);
+#ifndef NDEBUG
 	int i = 8;
-	while (i < 999999999)
-	{
+	while (i < 999999999) // Pages are indeed 4096 bytes long
 		dbg_print("%d - %u\n", i++, *(test++));
-		// write(STDOUT_FILENO, (test++) + '0', 1);
-	}
+#endif
 	FREE(freeme);
 	return 0;
 }
