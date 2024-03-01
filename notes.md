@@ -4,3 +4,4 @@ https://moss.cs.iit.edu/cs351/slides/slides-malloc.pdf
 https://gee.cs.oswego.edu/dl/html/malloc.html
 https://azeria-labs.com/heap-exploitation-part-1-understanding-the-glibc-heap-implementation/
 https://azeria-labs.com/heap-exploitation-part-2-glibc-heap-free-bins/
+https://medium.com/a-42-journey/how-to-create-your-own-malloc-library-b86fedd39b96

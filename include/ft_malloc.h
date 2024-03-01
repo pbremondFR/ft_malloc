@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   malloc.h                                           :+:      :+:    :+:   */
+/*   ft_malloc.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:18:42 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/29 23:34:56 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/01 01:35:36 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 
 # define PAGE_SIZE			getpagesize()
 # define TINY_ALLOC_MAX		128
+// See M_MMAP_THRESHOLD
+// # define SMALL_ALLOC_MAX	128 * 1024
 # define SMALL_ALLOC_MAX	512
 # define TINY_ZONE_SIZE		ALIGN_TO(TINY_ALLOC_MAX * 100, PAGE_SIZE)
 # define SMALL_ZONE_SIZE	ALIGN_TO(SMALL_ALLOC_MAX * 100, PAGE_SIZE)
