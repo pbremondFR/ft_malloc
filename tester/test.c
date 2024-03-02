@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/01 01:18:55 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/02 18:29:00 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-__attribute_maybe_unused__
+__attribute__((unused))
 static void	do_static_asserts()
 {
 	static_assert(ALIGN(0x123) % alignof(void*) == 0, "Incorrect alignment macro");
