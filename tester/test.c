@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/02 18:29:00 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/04 16:45:40 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,14 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include <pthread.h>
+
 __attribute__((unused))
 static void	do_static_asserts()
 {
-	static_assert(ALIGN(0x123) % alignof(void*) == 0, "Incorrect alignment macro");
-	static_assert(ALIGN(0x2) % alignof(void*) == 0, "Incorrect alignment macro");
-	static_assert(ALIGN(0x0) % alignof(void*) == 0, "Incorrect alignment macro");
+	static_assert(ALIGN_MALLOC(0x123) % MALLOC_ALIGNMENT == 0, "Incorrect alignment macro");
+	static_assert(ALIGN_MALLOC(0x2) % MALLOC_ALIGNMENT == 0, "Incorrect alignment macro");
+	static_assert(ALIGN_MALLOC(0x0) % MALLOC_ALIGNMENT == 0, "Incorrect alignment macro");
 
 	static_assert(ALIGN_TO(0x123, 4) % 4 == 0, "Incorrect alignment macro");
 	static_assert(ALIGN_TO(0x2, 4) % 4 == 0, "Incorrect alignment macro");
@@ -35,11 +37,20 @@ static void	do_static_asserts()
 	static_assert(ALIGN_TO(0x123, 16) % 16 == 0, "Incorrect alignment macro");
 	static_assert(ALIGN_TO(0x2, 16) % 16 == 0, "Incorrect alignment macro");
 	static_assert(ALIGN_TO(0x0, 16) % 16 == 0, "Incorrect alignment macro");
+
+	static_assert(MALLOC_ALIGNMENT == 16, "Possibly bad malloc alignment value");
+}
+
+static void	print_settings()
+{
+	dbg_print("Page size: %d, %ld\n", getpagesize(), sysconf(_SC_PAGESIZE));
+	dbg_print("Malloc alignment: %zu\n", MALLOC_ALIGNMENT);
 }
 
 int main()
 {
-	dbg_print("Page size: %d, %ld\n", getpagesize(), sysconf(_SC_PAGESIZE));
+	print_settings();
+	printf("Thread id: %lu\n", pthread_self());
 
 	const char msg[] = "Hello world!\n";
 	write(STDOUT_FILENO, msg, sizeof(msg));
@@ -49,7 +60,7 @@ int main()
 	dbg_print("%s", test);
 #ifndef NDEBUG
 	int i = 8;
-	while (i < 999999999) // Pages are indeed 4096 bytes long
+	while (i < 10) // Pages are indeed 4096 bytes long
 		dbg_print("%d - %u\n", i++, *(test++));
 #endif
 	FREE(freeme);

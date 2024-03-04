@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:18:42 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/01 01:35:36 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/01 17:36:30 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include <stdalign.h>
 
 # define ALIGN_TO(x, size)	(((size_t)x + (size-1)) & ~(size-1))
-# define ALIGN(x)	 		ALIGN_TO(x, alignof(void*))
+# define MALLOC_ALIGNMENT	alignof(max_align_t)
+# define ALIGN_MALLOC(x)	ALIGN_TO(x, MALLOC_ALIGNMENT)
 
 # define PAGE_SIZE			getpagesize()
 # define TINY_ALLOC_MAX		128

@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/01 00:28:54 by pbremond         ###   ########.fr        #
+#    Updated: 2024/03/01 21:17:00 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,7 +54,7 @@ LIBFT := libft.a
 LIBFT_PATH := libft
 
 LDFLAGS := -L./$(LIBFT_PATH) -L.
-LDLIBS := -lft
+LDLIBS := -lft -lpthread
 
 LIBFT_BUILD_ARGS := CFLAGS=-std=gnu17 CC=$(CC)
 
