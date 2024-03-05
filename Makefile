@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/01 21:17:00 by pbremond         ###   ########.fr        #
+#    Updated: 2024/03/05 20:23:44 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,7 +48,7 @@ SRC_DIR = src
 TEST_DIR = tester
 
 # CC = gcc
-CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc $(INCLUDES)
+CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc -fvisibility=hidden $(INCLUDES)
 
 LIBFT := libft.a
 LIBFT_PATH := libft
@@ -63,6 +63,10 @@ ifdef BUILD_DEBUG
 	TGT_DIR := debug
 	CFLAGS += -gdwarf-4 -Og -fno-omit-frame-pointer
 	LIBFT_BUILD_ARGS += BUILD_DEBUG=1
+	ifndef VALGRIND
+		CFLAGS += -fsanitize=address
+		LDFLAGS += -fsanitize=address
+	endif
 else
 	OBJ_DIR := objs
 	TGT_DIR := release
@@ -70,16 +74,12 @@ else
 	CPPFLAGS += -DNDEBUG
 endif
 
-ifndef VALGRIND
-	CFLAGS += -fsanitize=address
-	LDFLAGS += -fsanitize=address
-endif
 
 # ============================================================================ #
 # ============================================================================ #
 
 # Source files used in both mandatory and bonus parts
-SRC_COMMON =	malloc.c calloc.c free.c realloc.c
+SRC_COMMON =	malloc.c calloc.c free.c realloc.c utils.c
 
 # ============================================================================ #
 # ============================================================================ #

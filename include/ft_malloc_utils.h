@@ -1,37 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   malloc_structs.h                                   :+:      :+:    :+:   */
+/*   ft_malloc_utils.h                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/29 00:27:48 by pbremond          #+#    #+#             */
-/*   Updated: 2024/02/29 15:16:25 by pbremond         ###   ########.fr       */
+/*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
+/*   Updated: 2024/03/05 20:24:31 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MALLOC_STRUCTS_H
-# define MALLOC_STRUCTS_H
-# include <stddef.h>
-# include <stdbool.h>
-# include <stdalign.h>
+#ifndef FT_MALLOC_UTILS_H
+# define FT_MALLOC_UTILS_H
 
-# define CHUNK_SIZE_MASK	(alignof(void*) - 1)
+# define Min(a,b)					\
+	({								\
+		__typeof__ (a) _a = (a);	\
+		__typeof__ (b) _b = (b);	\
+		_a < _b ? _a : _b;			\
+	})
 
-struct s_chunk
-{
-	size_t			size;
-	struct s_chunk	*next;
-};
+# define Max(a,b)					\
+	({								\
+		__typeof__ (a) _a = (a);	\
+		__typeof__ (b) _b = (b);	\
+		_a > _b ? _a : _b;			\
+	})
 
-inline get_chunk_size(const struct s_chunk *chunk)
-{
-	return chunk->size & ~CHUNK_SIZE_MASK;
-}
-
-inline is_chunk_free(const struct s_chunk *chunk)
-{
-	return chunk->size & 0x1;
-}
+void	rec_putnbr(int n);
+void	rec_putnbr_base(int n, const char *base);
 
 #endif

@@ -6,11 +6,13 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/04 16:45:40 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/05 21:29:42 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_malloc.h"
+#include "ft_malloc_defines.h"
+#include "ft_malloc_structs.h"
 #include "libft.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -47,22 +49,52 @@ static void	print_settings()
 	dbg_print("Malloc alignment: %zu\n", MALLOC_ALIGNMENT);
 }
 
+static void	test_alignment()
+{
+	void *test = MALLOC(11);
+	if ((size_t)test % MALLOC_ALIGNMENT != 0)
+	{
+		ft_putstr("BAAAD ALIGN!!!!\n");
+	}
+	FREE(test);
+
+	for (int i = 0; i < 10; ++i)
+	{
+		int size = rand() % 1024 * 1024;
+		void *test2 = malloc(size);
+		printf("### Size: %10d - Test pointer: %p ###\n", size, test2);
+		free(test2);
+	}
+}
+
 int main()
 {
+	srand(time(NULL));
+
 	print_settings();
-	printf("Thread id: %lu\n", pthread_self());
+	dbg_print("Thread id: %lu\n", pthread_self());
 
 	const char msg[] = "Hello world!\n";
-	write(STDOUT_FILENO, msg, sizeof(msg));
+	ft_putstr("Message: ");
+	ft_putstr(msg);
+
 	char *test = MALLOC(sizeof(msg));
-	void *freeme = test;
 	strcpy(test, msg);
-	dbg_print("%s", test);
-#ifndef NDEBUG
-	int i = 8;
-	while (i < 10) // Pages are indeed 4096 bytes long
-		dbg_print("%d - %u\n", i++, *(test++));
-#endif
-	FREE(freeme);
+	ft_putstr("Copy: ");
+	ft_putstr(test);
+	FREE(test);
+
+	test_alignment();
+
+	{
+		char *truc = ft_strdup("Salut mon pote comment ca av fhdjsk fhjkdasl fhklsdjahfjkladshfjklashfjkl\n");
+		char *muche = ft_strdup("jkfdhkasjlf hjsdkafhdjksafhjkdsalfhjkdasl connard\n");
+
+		ft_putstr(truc);
+		ft_putstr(muche);
+		free(muche);
+		free(truc);
+	}
+
 	return 0;
 }

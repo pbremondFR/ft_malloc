@@ -6,32 +6,13 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:18:42 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/01 17:36:30 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/05 21:29:50 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MALLOC_H
 # define MALLOC_H
 # include <stddef.h>
-# include <stdalign.h>
-
-# define ALIGN_TO(x, size)	(((size_t)x + (size-1)) & ~(size-1))
-# define MALLOC_ALIGNMENT	alignof(max_align_t)
-# define ALIGN_MALLOC(x)	ALIGN_TO(x, MALLOC_ALIGNMENT)
-
-# define PAGE_SIZE			getpagesize()
-# define TINY_ALLOC_MAX		128
-// See M_MMAP_THRESHOLD
-// # define SMALL_ALLOC_MAX	128 * 1024
-# define SMALL_ALLOC_MAX	512
-# define TINY_ZONE_SIZE		ALIGN_TO(TINY_ALLOC_MAX * 100, PAGE_SIZE)
-# define SMALL_ZONE_SIZE	ALIGN_TO(SMALL_ALLOC_MAX * 100, PAGE_SIZE)
-
-# ifndef NDEBUG
-#  define dbg_print(...)		dprintf(2, __VA_ARGS__)
-# else
-#  define dbg_print(...)
-# endif
 
 /*
  * Use preproc defines to give a different name to these functions in debug.
