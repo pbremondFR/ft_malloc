@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 21:34:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/05 21:41:40 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/05 22:03:01 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 # define SIZEOF_ARRAY(x)	(sizeof(x) / sizeof(x[0]))
 
+// Completely unnecessary but I don't care, wanted to try it out once
 # define likely(x)		__builtin_expect(!!(x), 1)
 # define unlikely(x)	__builtin_expect(!!(x), 0)
 

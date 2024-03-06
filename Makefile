@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/05 20:23:44 by pbremond         ###   ########.fr        #
+#    Updated: 2024/03/06 13:32:38 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,7 +54,7 @@ LIBFT := libft.a
 LIBFT_PATH := libft
 
 LDFLAGS := -L./$(LIBFT_PATH) -L.
-LDLIBS := -lft -lpthread
+LDLIBS := -lft -lpthread -latomic
 
 LIBFT_BUILD_ARGS := CFLAGS=-std=gnu17 CC=$(CC)
 
@@ -85,7 +85,7 @@ SRC_COMMON =	malloc.c calloc.c free.c realloc.c utils.c
 # ============================================================================ #
 
 # Source files exclusive to mandatory part
-SRC_MANDATORY =	$(SRC_COMMON)
+SRC_MANDATORY =	$(SRC_COMMON) malloc_options.c
 
 SRC_MANDATORY_PLUS_PATH = $(addprefix $(SRC_DIR)/, $(SRC_MANDATORY))
 MANDATORY_OBJ = $(subst $(SRC_DIR)/, $(OBJ_DIR)/, $(patsubst %.c, %.o, $(SRC_MANDATORY_PLUS_PATH)))
@@ -94,7 +94,7 @@ MANDATORY_OBJ = $(subst $(SRC_DIR)/, $(OBJ_DIR)/, $(patsubst %.c, %.o, $(SRC_MAN
 # ============================================================================ #
 
 # Source files exclusive to bonus part
-SRC_BONUS =	$(SRC_COMMON)
+SRC_BONUS =	$(SRC_COMMON) malloc_options_bonus.c
 
 SRC_BONUS_PLUS_PATH = $(addprefix $(SRC_DIR)/, $(SRC_BONUS))
 BONUS_OBJ = $(subst $(SRC_DIR)/, $(OBJ_DIR)/, $(patsubst %.c, %.o, $(SRC_BONUS_PLUS_PATH)))

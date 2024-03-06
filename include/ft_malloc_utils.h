@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/05 20:24:31 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/05 22:03:39 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,7 @@
 
 void	rec_putnbr(int n);
 void	rec_putnbr_base(int n, const char *base);
+
+void	malloc_load_options();
 
 #endif
