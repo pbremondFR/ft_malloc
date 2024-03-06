@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 21:34:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/05 22:03:01 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/06 17:41:18 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,12 @@
 # define MALLOC_ALIGNMENT	(alignof(max_align_t))
 # define ALIGN_MALLOC(x)	ALIGN_TO(x, MALLOC_ALIGNMENT)
 
-# define PAGE_SIZE			getpagesize()
-# define TINY_ALLOC_MAX		128
+# define TINY_ALLOC_MAX_SZ		128
+# define TINY_HEAP_MIN_ELEM		100
 // See M_MMAP_THRESHOLD
-// # define SMALL_ALLOC_MAX	128 * 1024
-# define SMALL_ALLOC_MAX	512
-# define TINY_ZONE_SIZE		ALIGN_TO(TINY_ALLOC_MAX * 100, PAGE_SIZE)
-# define SMALL_ZONE_SIZE	ALIGN_TO(SMALL_ALLOC_MAX * 100, PAGE_SIZE)
+// # define SMALL_ALLOC_MAX_SZ	128 * 1024
+# define SMALL_ALLOC_MAX_SZ		512
+# define SMALL_HEAP_MIN_ELEM	100
 
 # define NUM_ARENAS			16
 

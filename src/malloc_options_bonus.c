@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 21:53:41 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 13:43:40 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/06 18:47:49 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,22 @@
 #include "libft.h"
 #include <stdlib.h>
 
+static bool	valid_options(t_malloc_options const* options)
+{
+	return (options->small_alloc_max_sz > options->tiny_alloc_max_sz)
+		&& (options->tiny_alloc_max_sz > 0);
+}
+
 static void override_malloc_options_from_env(t_malloc_options *options)
 {
 	typedef struct { const char *key; int *value; } kv_pair;
+	t_malloc_options new_options = *options;
 
 	kv_pair	parameters[] = {
-		{"OPTIMISTIC_ARENA_ASSIGN",	&options->optimistic_arena_assign},
-		{"TINY_ALLOC_MAX",			&options->tiny_alloc_max},
-		{"SMALL_ALLOC_MAX",			&options->small_alloc_max},
-		{"CHECK_ERRORS",			&options->check_errors},
+		{"OPTIMISTIC_ARENA_ASSIGN",	&new_options.optimistic_arena_assign},
+		{"TINY_ALLOC_MAX_SZ",		&new_options.tiny_alloc_max_sz},
+		{"SMALL_ALLOC_MAX_SZ",		&new_options.small_alloc_max_sz},
+		{"CHECK_ERRORS",			&new_options.check_errors},
 	};
 
 	for (unsigned int i = 0; i < SIZEOF_ARRAY(parameters); ++i)
@@ -36,9 +43,17 @@ static void override_malloc_options_from_env(t_malloc_options *options)
 				*parameters[i].value = value;
 		}
 	}
-	options->loaded = true;
+	if (valid_options(&new_options))
+		*options = new_options;
 }
 
+/*
+ * I KNOW that the atomic struct is larger than the lock-free max size, but I
+ * benchmarked _Atomic struct vs mutex and found either no significant changes
+ * or a slight advantage when using _Atomic in this case (clang probably uses
+ * a mutex under the hood). When combined with its sematic advantages
+ * (no need to use mutex + is guaranteed to be correct), I prefer to use _Atomic.
+ */
 void	malloc_load_options()
 {
 	ft_putstr("Setting malloc options\n");
@@ -50,15 +65,15 @@ void	malloc_load_options()
 		old_options = g_malloc_internals.options;
 		new_options = old_options;
 
-		// Override default values with environment variables
+		// Another thread already did that in the meantime, no need to block
+		if (g_malloc_internals.loaded_options == true)
+			return;
 		override_malloc_options_from_env(&new_options);
 	} while (!atomic_compare_exchange_strong(&g_malloc_internals.options, &old_options, new_options));
-
+	g_malloc_internals.loaded_options = true;
 
 	dbg_print("# Optimistic arena assign: %d\n", new_options.optimistic_arena_assign);
-	dbg_print("# Tiny alloc max: %d\n", new_options.tiny_alloc_max);
-	dbg_print("# Small alloc max: %d\n", new_options.small_alloc_max);
+	dbg_print("# Tiny alloc max: %d\n", new_options.tiny_alloc_max_sz);
+	dbg_print("# Small alloc max: %d\n", new_options.small_alloc_max_sz);
 	dbg_print("# Check errors: %d\n", new_options.check_errors);
-
-	g_malloc_internals.loaded_options = true;
 }

@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 00:27:48 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 13:41:18 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/06 18:41:47 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,20 +68,20 @@ typedef struct
 
 typedef struct
 {
-	alignas(32)
-	int	loaded;
-	int	tiny_alloc_max;
-	int	small_alloc_max;
+	int	tiny_alloc_max_sz;
+	int	small_alloc_max_sz;
 	int	optimistic_arena_assign;
 	int	check_errors;
 }	t_malloc_options;
+
+typedef _Atomic t_malloc_options atomic_options;
 
 typedef struct
 {
 	t_malloc_arenas	arenas[NUM_ARENAS];	// Array of arenas
 	// Put other coolstuff/options for malloc in there, for debugging or
 	// bonuses like dynamically adjustable options
-	atomic_bool			loaded_options;
+	atomic_bool		loaded_options;
 	_Atomic t_malloc_options	options;
 
 }	t_malloc_internals;

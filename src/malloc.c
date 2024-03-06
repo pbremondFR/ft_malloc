@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 13:11:45 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/06 18:41:47 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,36 +18,6 @@
 #include <errno.h>
 #include <sys/mman.h>
 #include <stdbool.h>
-
-t_malloc_internals	g_malloc_internals = {
-	/* On this specific architecture, this is technically unnecessary. PTHREAD_MUTEX_INITIALIZER
-	 * is equivalent to zero-initialization, and static variables as well as partial-initialization
-	 * always zero-initialize the object. But I guess it's better to be safe/portable.
-	*/
-	.arenas = {
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-		{ 0, PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL },
-	},
-	.loaded_options = false,
-	.options = {0, TINY_ALLOC_MAX, SMALL_ALLOC_MAX, 0, 0},
-};
-
-_Thread_local
-t_malloc_arenas		*g_arenas;
 
 static t_heap	*create_new_heap(size_t heap_size)
 {
@@ -75,8 +45,9 @@ static void	assign_arena_ptr()
 {
 	ft_putstr("Assigning arenas ptr\n");
 
-	t_malloc_arenas	*best_arenas	= &g_malloc_internals.arenas[0];
-	size_t			min_threads		= SIZE_MAX;
+	t_malloc_arenas		*best_arenas	= &g_malloc_internals.arenas[0];
+	size_t				min_threads		= SIZE_MAX;
+	t_malloc_options	options			= g_malloc_internals.options;
 
 	for (unsigned int i = 0; i < sizeof(NUM_ARENAS); ++i)
 	{
@@ -85,8 +56,8 @@ static void	assign_arena_ptr()
 		if (arenas->num_threads == 0)
 		{
 			++arenas->num_threads;
-			arenas->tiny_heaps = create_new_heap(g_malloc_internals.options.tiny_alloc_max * 100);
-			arenas->small_heaps = create_new_heap(g_malloc_internals.options.small_alloc_max * 100);
+			arenas->tiny_heaps = create_new_heap(options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+			arenas->small_heaps = create_new_heap(options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
 			g_arenas = arenas;
 			pthread_mutex_unlock(&arenas->mutex);
 			return;
@@ -104,8 +75,8 @@ static void	assign_arena_ptr()
 	pthread_mutex_lock(&best_arenas->mutex);
 	g_arenas = best_arenas;
 	++best_arenas->num_threads;
-	best_arenas->tiny_heaps = create_new_heap(g_malloc_internals.options.tiny_alloc_max * 100);
-	best_arenas->small_heaps = create_new_heap(g_malloc_internals.options.small_alloc_max * 100);
+	best_arenas->tiny_heaps = create_new_heap(options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+	best_arenas->small_heaps = create_new_heap(options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
 	pthread_mutex_unlock(&best_arenas->mutex);
 }
 
@@ -124,8 +95,8 @@ static void	assign_arena_ptr()
 		{
 			pthread_mutex_lock(&arenas->mutex);
 			// Initialize arena, heap, and chunks since we've never used it before
-			arenas->tiny_heaps = create_new_heap(g_malloc_internals.tiny_alloc_max * 100);
-			arenas->small_heaps = create_new_heap(g_malloc_internals.small_alloc_max * 100);
+			arenas->tiny_heaps = create_new_heap(g_malloc_internals.tiny_alloc_max_sz * 100);
+			arenas->small_heaps = create_new_heap(g_malloc_internals.small_alloc_max_sz * 100);
 			g_arenas = arenas;
 			pthread_mutex_unlock(&arenas->mutex);
 			return;	// Early return
@@ -156,11 +127,11 @@ void	*MALLOC(size_t size)
 		errno = ENOMEM;
 		return NULL;
 	}
-	else if (size <= TINY_ALLOC_MAX && false)
+	else if (size <= TINY_ALLOC_MAX_SZ && false)
 	{
 		// ...
 	}
-	else if (size <= SMALL_ALLOC_MAX && false)
+	else if (size <= SMALL_ALLOC_MAX_SZ && false)
 	{
 		// ...
 	}

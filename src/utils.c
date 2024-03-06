@@ -6,13 +6,21 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 20:23:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/05 20:26:51 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/06 18:52:17 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include "libft.h"
 
+/*
+ * Apparently it's hotly debated whether it's GCC's or glibc's fault that
+ * we're supposed to check EVERY call to write. Even better, casting it to void
+ * doesn't do SHIT. So either you have to precede every function call with (void)!
+ * which is stupid and cluttery, or just yeet the warning out. So I'll just do that.
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
 void	rec_putnbr(int n)
 {
 	unsigned int	u_nb;
@@ -56,3 +64,4 @@ void	rec_putnbr_base(long nbr, const char *base)
 	else if (u_nb < base_len)
 		write(1, &base[u_nb % base_len], 1);
 }
+#pragma GCC diagnostic pop

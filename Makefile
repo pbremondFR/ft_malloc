@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/06 13:32:38 by pbremond         ###   ########.fr        #
+#    Updated: 2024/03/06 18:26:28 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,8 +47,8 @@ INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
 TEST_DIR = tester
 
-# CC = gcc
-CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc -fvisibility=hidden $(INCLUDES)
+CC = gcc
+CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc -fvisibility=hidden -march=native $(INCLUDES)
 
 LIBFT := libft.a
 LIBFT_PATH := libft
@@ -79,7 +79,7 @@ endif
 # ============================================================================ #
 
 # Source files used in both mandatory and bonus parts
-SRC_COMMON =	malloc.c calloc.c free.c realloc.c utils.c
+SRC_COMMON =	malloc.c calloc.c free.c realloc.c utils.c static_data.c
 
 # ============================================================================ #
 # ============================================================================ #
