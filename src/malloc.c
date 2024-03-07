@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 18:41:47 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 13:05:24 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,15 +154,15 @@ void	*MALLOC(size_t size)
 		chunk->size |= FLAG_CHUNK_MMAPPED;
 		chunk->next = NULL;
 		/* Append chunk to list of big allocs. Required by subject for debugging functions */
-		// if (g_arenas->big_allocs == NULL)
-		// 	g_arenas->big_allocs = chunk;
-		// else
-		// {
-		// 	t_chunk *last = g_arenas->big_allocs;
-		// 	while (last->next != NULL)
-		// 		last = last->next;
-		// 	last->next = chunk;
-		// }
+		if (g_arenas->big_allocs == NULL)
+			g_arenas->big_allocs = chunk;
+		else
+		{
+			t_chunk *last = g_arenas->big_allocs;
+			while (last->next != NULL)
+				last = last->next;
+			last->next = chunk;
+		}
 		return (char*)chunk + header_size;
 	}
 }

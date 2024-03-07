@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/05 21:29:42 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/06 22:15:59 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,23 +49,23 @@ static void	print_settings()
 	dbg_print("Malloc alignment: %zu\n", MALLOC_ALIGNMENT);
 }
 
-static void	test_alignment()
-{
-	void *test = MALLOC(11);
-	if ((size_t)test % MALLOC_ALIGNMENT != 0)
-	{
-		ft_putstr("BAAAD ALIGN!!!!\n");
-	}
-	FREE(test);
+// static void	test_alignment()
+// {
+// 	void *test = MALLOC(11);
+// 	if ((size_t)test % MALLOC_ALIGNMENT != 0)
+// 	{
+// 		ft_putstr("BAAAD ALIGN!!!!\n");
+// 	}
+// 	FREE(test);
 
-	for (int i = 0; i < 10; ++i)
-	{
-		int size = rand() % 1024 * 1024;
-		void *test2 = malloc(size);
-		printf("### Size: %10d - Test pointer: %p ###\n", size, test2);
-		free(test2);
-	}
-}
+// 	for (int i = 0; i < 10; ++i)
+// 	{
+// 		int size = rand() % 1024 * 1024;
+// 		void *test2 = malloc(size);
+// 		printf("### Size: %10d - Test pointer: %p ###\n", size, test2);
+// 		free(test2);
+// 	}
+// }
 
 int main()
 {
@@ -79,17 +79,22 @@ int main()
 	ft_putstr(msg);
 
 	char *test = MALLOC(sizeof(msg));
+		show_alloc_mem();
 	strcpy(test, msg);
 	ft_putstr("Copy: ");
 	ft_putstr(test);
 	FREE(test);
+		show_alloc_mem();
 
-	test_alignment();
+	// test_alignment();
 
 	{
+		ft_putstr("before truc\n");
 		char *truc = ft_strdup("Salut mon pote comment ca av fhdjsk fhjkdasl fhklsdjahfjkladshfjklashfjkl\n");
+		ft_putstr("after truc\n");
 		char *muche = ft_strdup("jkfdhkasjlf hjsdkafhdjksafhjkdsalfhjkdasl connard\n");
-
+		ft_putstr("after MUCHE\n");
+		show_alloc_mem();
 		ft_putstr(truc);
 		ft_putstr(muche);
 		free(muche);

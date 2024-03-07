@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 00:27:48 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 18:41:47 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/06 19:43:38 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ typedef struct
 	// Put other coolstuff/options for malloc in there, for debugging or
 	// bonuses like dynamically adjustable options
 	atomic_bool		loaded_options;
-	_Atomic t_malloc_options	options;
+	atomic_options	options;
 
 }	t_malloc_internals;
 

@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/06 18:26:28 by pbremond         ###   ########.fr        #
+#    Updated: 2024/03/06 20:01:09 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -79,7 +79,8 @@ endif
 # ============================================================================ #
 
 # Source files used in both mandatory and bonus parts
-SRC_COMMON =	malloc.c calloc.c free.c realloc.c utils.c static_data.c
+SRC_COMMON =	malloc.c calloc.c free.c realloc.c utils.c static_data.c\
+	show_alloc_mem.c
 
 # ============================================================================ #
 # ============================================================================ #
