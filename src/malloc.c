@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 13:28:39 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 20:36:01 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,11 +120,11 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 		*list = chunk;
 		return;
 	}
-	t_chunk *last = *list;
-	while (last->next != NULL && chunk > last->next)
-		last = last->next;
-	chunk->next = (last->next ? last->next->next : NULL);
-	last->next = chunk;
+	t_chunk *head = *list;
+	while (head->next != NULL && chunk > head->next)
+		head = head->next;
+	chunk->next = head->next;
+	head->next = chunk;
 }
 
 SHARED_LIB_EXPORT
