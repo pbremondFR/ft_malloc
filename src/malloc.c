@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 13:05:24 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 13:28:39 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,21 @@ static void	assign_arena_ptr()
 
 #endif
 
+static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
+{
+	if (*list == NULL || *list > chunk)
+	{
+		chunk->next = *list;
+		*list = chunk;
+		return;
+	}
+	t_chunk *last = *list;
+	while (last->next != NULL && chunk > last->next)
+		last = last->next;
+	chunk->next = (last->next ? last->next->next : NULL);
+	last->next = chunk;
+}
+
 SHARED_LIB_EXPORT
 void	*MALLOC(size_t size)
 {
@@ -154,15 +169,10 @@ void	*MALLOC(size_t size)
 		chunk->size |= FLAG_CHUNK_MMAPPED;
 		chunk->next = NULL;
 		/* Append chunk to list of big allocs. Required by subject for debugging functions */
-		if (g_arenas->big_allocs == NULL)
-			g_arenas->big_allocs = chunk;
-		else
-		{
-			t_chunk *last = g_arenas->big_allocs;
-			while (last->next != NULL)
-				last = last->next;
-			last->next = chunk;
-		}
+		pthread_mutex_unlock(&g_arenas->mutex);
+		insert_chunk_in_list(&g_arenas->big_allocs, chunk);
+		pthread_mutex_unlock(&g_arenas->mutex);
+		ft_putstr("|OUT OF MALLOC\n+-------------\n");
 		return (char*)chunk + header_size;
 	}
 }
