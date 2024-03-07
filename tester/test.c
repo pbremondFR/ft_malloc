@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 13:58:11 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:27:42 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "ft_malloc_defines.h"
 #include "ft_malloc_structs.h"
 #include "libft.h"
+#include "ansi_color.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -56,6 +57,20 @@ static void	print_settings()
 {
 	dbg_print("Page size: %d, %ld\n", getpagesize(), sysconf(_SC_PAGESIZE));
 	dbg_print("Malloc alignment: %zu\n", MALLOC_ALIGNMENT);
+}
+
+static void	*routine(void *param)
+{
+	(void)param;
+	ft_putstr(RED"Starting thread..."RESET"\n");
+	void *mem_tiny = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+	void *mem_small = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+	void *mem_large = MALLOC(SMALL_ALLOC_MAX_SZ * 2);
+	sleep(2);
+	FREE(mem_tiny);
+	FREE(mem_small);
+	FREE(mem_large);
+	return NULL;
 }
 
 int main()
@@ -107,6 +122,30 @@ int main()
 		show_alloc_mem();
 		FREE(foo);
 		FREE(bar);
+	}
+	newtest();
+	{
+		pthread_t	threads[8];
+
+		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+			pthread_create(&threads[i], NULL, routine, NULL);
+		// All threads allocate and wait for us to print memory before freeing
+		sleep(1);
+		show_alloc_mem();
+		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+			pthread_join(threads[i], NULL);
+	}
+	newtest();
+	{
+		pthread_t	threads[64];
+
+		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+			pthread_create(&threads[i], NULL, routine, NULL);
+		// All threads allocate and wait for us to print memory before freeing
+		sleep(1);
+		show_alloc_mem();
+		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+			pthread_join(threads[i], NULL);
 	}
 
 	return 0;

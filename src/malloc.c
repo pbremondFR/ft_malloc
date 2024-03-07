@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 20:36:01 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:29:30 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "ft_malloc_structs.h"
 #include "ft_malloc_utils.h"
 #include "libft.h"
+#include "ansi_color.h"
 #include <errno.h>
 #include <sys/mman.h>
 #include <stdbool.h>
@@ -34,22 +35,19 @@ static t_heap	*create_new_heap(size_t heap_size)
 	return heap;
 }
 
-// # define FT_MANDATORY
 /*
  * Assign the g_arenas pointer to the best available arenas collection, i.e.
  * the one with the least amount of threads using it.
  */
-#ifndef FT_MANDATORY
-
 static void	assign_arena_ptr()
 {
-	ft_putstr("Assigning arenas ptr\n");
+	ft_putstr(CYN"Assigning arenas ptr"RESET"\n");
 
 	t_malloc_arenas		*best_arenas	= &g_malloc_internals.arenas[0];
 	size_t				min_threads		= SIZE_MAX;
 	t_malloc_options	options			= g_malloc_internals.options;
 
-	for (unsigned int i = 0; i < sizeof(NUM_ARENAS); ++i)
+	for (unsigned int i = 0; i < NUM_ARENAS; ++i)
 	{
 		t_malloc_arenas *arenas = &g_malloc_internals.arenas[i];
 		pthread_mutex_lock(&arenas->mutex);
@@ -80,38 +78,6 @@ static void	assign_arena_ptr()
 	pthread_mutex_unlock(&best_arenas->mutex);
 }
 
-#else
-
-static void	assign_arena_ptr()
-{
-	size_t zero = 0;
-	size_t min_threads = SIZE_MAX;
-
-	for (unsigned int i = 0; i < sizeof(NUM_ARENAS); ++i)
-	{
-		t_malloc_arenas *arenas = &g_malloc_internals.arenas[i];
-		// If number of threads is zero, set it to one, set arenas pointers, and stop search
-		if (atomic_compare_exchange_strong(&arenas->num_threads, &zero, 1))
-		{
-			pthread_mutex_lock(&arenas->mutex);
-			// Initialize arena, heap, and chunks since we've never used it before
-			arenas->tiny_heaps = create_new_heap(g_malloc_internals.tiny_alloc_max_sz * 100);
-			arenas->small_heaps = create_new_heap(g_malloc_internals.small_alloc_max_sz * 100);
-			g_arenas = arenas;
-			pthread_mutex_unlock(&arenas->mutex);
-			return;	// Early return
-		}
-		size_t num_threads_before = arenas->num_threads;
-		if (!atomic_compare_exchange_strong(&arenas->num_threads, &num_threads_before, num_threads_before + 1))
-		{
-			i = 0;
-			continue;
-		}
-	}
-}
-
-#endif
-
 static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 {
 	if (*list == NULL || *list > chunk)
@@ -130,7 +96,7 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 SHARED_LIB_EXPORT
 void	*MALLOC(size_t size)
 {
-	ft_putstr("+-------------\n|IN MALLOC\n");
+	// ft_putstr(GRN"+-------------\n|IN MALLOC"RESET"\n");
 	if (unlikely(g_malloc_internals.loaded_options == false))
 		malloc_load_options();
 	if (unlikely(g_arenas == NULL))
@@ -172,7 +138,7 @@ void	*MALLOC(size_t size)
 		pthread_mutex_unlock(&g_arenas->mutex);
 		insert_chunk_in_list(&g_arenas->big_allocs, chunk);
 		pthread_mutex_unlock(&g_arenas->mutex);
-		ft_putstr("|OUT OF MALLOC\n+-------------\n");
+		// ft_putstr(GRN"|OUT OF MALLOC\n+-------------"RESET"\n");
 		return (char*)chunk + header_size;
 	}
 }

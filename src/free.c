@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 13:51:20 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:27:52 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "libft.h"
+#include "ansi_color.h"
 
 static void	remove_large_chunk_from_list(t_chunk *chunk)
 {
@@ -38,13 +39,13 @@ static void	remove_large_chunk_from_list(t_chunk *chunk)
 SHARED_LIB_EXPORT
 void	FREE(void *ptr)
 {
-	dbg_print("IN FREE\n");
+	// dbg_print(YEL"IN FREE"RESET"\n");
 	if (ptr == NULL)
 		return;
 	t_chunk *chunk = ptr - sizeof(*chunk);
 
-	dbg_print("ptr:   %p\n", ptr);
-	dbg_print("chunk: %p\n", chunk);
+	// dbg_print(YEL"ptr:   %p"RESET"\n", ptr);
+	// dbg_print(YEL"chunk: %p"RESET"\n", chunk);
 
 	remove_large_chunk_from_list(chunk);
 	size_t size = chunk->size;
@@ -53,5 +54,5 @@ void	FREE(void *ptr)
 		dbg_print("ERROR when freeing shit\n");
 		dbg_print("Size is %zu\n", chunk->size);
 	}
-	dbg_print("OUT OF FREE\n");
+	// dbg_print(YEL"OUT OF FREE"RESET"\n");
 }

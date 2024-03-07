@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 19:23:02 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 13:08:27 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 21:13:06 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 
 static size_t	print_large_allocs(const t_chunk *chunks)
 {
-	static char	buf[1024] = {0};
-	size_t		sum = 0;
+	char	buf[256] = {0};
+	size_t	sum = 0;
 
 	ft_putstr("LARGE:\n");
 	for (; chunks != NULL; chunks = chunks->next)
@@ -33,11 +33,13 @@ static size_t	print_large_allocs(const t_chunk *chunks)
 SHARED_LIB_EXPORT
 void	show_alloc_mem()
 {
-	static char	buf[1024] = {0};
-	size_t sum = 0;
+	char	buf[256] = {0};
+	size_t	sum = 0;
 
 	for (unsigned int i = 0; i < SIZEOF_ARRAY(g_malloc_internals.arenas); ++i)
 	{
+		snprintf(buf, sizeof(buf), "Arena %d:\n", i);
+		ft_putstr(buf);
 		t_malloc_arenas *arenas = &g_malloc_internals.arenas[i];
 		if (arenas->num_threads == 0)
 			continue;
