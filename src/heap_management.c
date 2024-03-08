@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 02:47:28 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 18:25:21 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,73 @@ void	insert_heap_in_list(t_heap **list, t_heap *new_heap)
 		prev->size += new_heap->size;
 		prev->next = new_heap->next;
 	}
+}
+
+/*
+ * Finds first free chunk in a given heap. Doesn't traverse heaps.
+ */
+static t_chunk	*find_first_free_chunk_in_heap(t_heap const *heap)
+{
+	t_chunk *chunk = heap->chunks;
+	while (chunk != NULL && (char*)chunk < (char*)heap + heap->size)
+	{
+		if (chunk->size & FLAG_CHUNK_FREE)
+			return chunk;
+		else
+			chunk = (t_chunk*)((char*)chunk + chunk->size);
+	}
+	return NULL;
+}
+
+/*
+ * Perform search for best chunk (that is, smallest possible size to avoid fragmentation)
+ * in given list of heaps.
+ */
+t_chunk	*find_best_chunk_for_alloc(t_heap const *heaps, size_t req_size)
+{
+	t_chunk	*best_fit = NULL;
+	req_size = ALIGN_MALLOC(req_size);
+
+	for (const t_heap *head = heaps; head != NULL; head = head->next)
+	{
+		t_chunk *chunk = find_first_free_chunk_in_heap(head);
+		while (chunk != NULL && (char*)chunk < (char*)head + head->size)
+		{
+			if (chunk->size - sizeof(t_chunk) >= req_size &&
+				(!best_fit || chunk->size < best_fit->size))
+			{
+				best_fit = chunk;
+			}
+			chunk = chunk->next;
+		}
+	}
+	return best_fit;
+}
+
+static void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
+{
+	size_t new_size = ALIGN_MALLOC(req_size + sizeof(t_chunk));
+	// If new chunk size doesn't leave enough the minimum amount of space for next chunk,
+	// do nothing
+	if (chunk->size - new_size < ALIGN_MALLOC(sizeof(t_chunk) + MALLOC_ALIGNMENT))
+		return;
+
+	// Else, divide chunk
+	t_chunk *new_next_chunk = (void*)chunk + new_size;
+	new_next_chunk->size = chunk->size - new_size;
+	chunk->size = new_size;
+}
+
+t_chunk	*alloc_chunk_from_heaps(t_heap **heap_lst, size_t req_size, size_t new_heap_min_sz)
+{
+	t_chunk *selected_chunk = find_best_chunk_for_alloc(*heap_lst, req_size);
+	if (selected_chunk == NULL)
+	{
+		t_heap *new_heap = create_new_heap(new_heap_min_sz);
+		insert_heap_in_list(heap_lst, new_heap);
+		selected_chunk = find_best_chunk_for_alloc(*heap_lst, req_size);
+	}
+	try_shrink_chunk_for_requested_size(selected_chunk, req_size);
+	selected_chunk->size &= ~FLAG_CHUNK_FREE;
+	return selected_chunk;
 }

@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 02:39:59 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 18:04:50 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,8 @@ void	rec_putnbr_base(int n, const char *base);
 void	malloc_load_options();
 t_heap	*create_new_heap(size_t heap_size);
 void	insert_heap_in_list(t_heap **list, t_heap *new_heap);
+
+t_chunk	*find_best_chunk_for_alloc(t_heap const *heaps, size_t req_size);
+t_chunk	*alloc_chunk_from_heaps(t_heap **heap_lst, size_t req_size, size_t new_heap_min_sz);
 
 #endif

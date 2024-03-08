@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 23:08:08 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 18:19:32 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,17 @@ void	FREE(void *ptr)
 	// dbg_print(YEL"ptr:   %p"RESET"\n", ptr);
 	// dbg_print(YEL"chunk: %p"RESET"\n", chunk);
 
-	remove_large_chunk_from_list(chunk);
 	size_t size = chunk->size & CHUNK_SIZE_MASK;
-	if (munmap(chunk, size) != 0)
+
+	if (chunk->size & FLAG_CHUNK_MMAPPED)
 	{
-		dbg_print("ERROR when freeing shit\n");
-		dbg_print("Chunk raw size is %zu\n", chunk->size);
+		remove_large_chunk_from_list(chunk);
+		if (munmap(chunk, size) != 0)
+			dbg_print("OH FUCK\n");
+	}
+	else
+	{
+
 	}
 	// dbg_print(YEL"OUT OF FREE"RESET"\n");
 }

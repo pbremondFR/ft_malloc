@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 02:39:13 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 18:22:53 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,11 @@ static void	assign_arena_ptr()
 	}
 	pthread_mutex_lock(&best_arenas->mutex);
 	g_arenas = best_arenas;
-	++best_arenas->num_threads;
-	best_arenas->tiny_heaps = create_new_heap(options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
-	best_arenas->small_heaps = create_new_heap(options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
+	if (++best_arenas->num_threads == 1)	// First thread to obtain this arena
+	{
+		best_arenas->tiny_heaps = create_new_heap(options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+		best_arenas->small_heaps = create_new_heap(options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
+	}
 	pthread_mutex_unlock(&best_arenas->mutex);
 }
 
@@ -90,19 +92,28 @@ void	*MALLOC(size_t size)
 	if (unlikely(g_arenas == NULL))
 		assign_arena_ptr();
 
+	t_malloc_options options = g_malloc_internals.options;
 	if (size > PTRDIFF_MAX)
 	{
 		dbg_print("|Bad size, enomem and shit\n");
 		errno = ENOMEM;
 		return NULL;
 	}
-	else if (size <= TINY_ALLOC_MAX_SZ && false)
+	else if (size <= (size_t)options.tiny_alloc_max_sz)
 	{
-		// ...
+		pthread_mutex_lock(&g_arenas->mutex);
+		t_chunk *chunk = alloc_chunk_from_heaps(&g_arenas->tiny_heaps, size,
+			options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+		pthread_mutex_unlock(&g_arenas->mutex);
+		return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
 	}
-	else if (size <= SMALL_ALLOC_MAX_SZ && false)
+	else if (size <= (size_t)options.small_alloc_max_sz)
 	{
-		// ...
+		pthread_mutex_lock(&g_arenas->mutex);
+		t_chunk *chunk = alloc_chunk_from_heaps(&g_arenas->small_heaps, size,
+			options.small_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+		pthread_mutex_unlock(&g_arenas->mutex);
+		return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
 	}
 	else
 	{
