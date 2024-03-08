@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 00:27:48 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 19:43:38 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 02:17:33 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,6 @@ typedef struct s_chunk
 	size_t			size;	// Also includes flags like GNU malloc
 	struct s_chunk	*next;	// Do NOT read when block isn't free, except for mmap'd blocks
 }	t_chunk;
-
-inline size_t get_chunk_size(const struct s_chunk *chunk)
-{
-	return chunk->size & CHUNK_SIZE_MASK;
-}
-
-inline bool is_chunk_free(const struct s_chunk *chunk)
-{
-	return chunk->size & FLAG_CHUNK_FREE;
-}
 
 typedef struct s_heap
 {

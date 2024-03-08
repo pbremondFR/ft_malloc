@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 22:29:30 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 02:39:13 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,21 +19,6 @@
 #include <errno.h>
 #include <sys/mman.h>
 #include <stdbool.h>
-
-static t_heap	*create_new_heap(size_t heap_size)
-{
-	const size_t len = ALIGN_TO(heap_size + sizeof(t_heap), getpagesize());
-
-	t_heap *heap = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	heap->size = heap_size;
-	// heap->next = NULL;	// Optional, mmap zero inits everything
-	heap->chunks = (t_chunk*)ALIGN_MALLOC(heap + 1);	// Chunks start after heap header, correctly aligned
-	// heap->chunks->prev_size = 0;
-	heap->chunks->size = len - ((char*)heap->chunks - (char*)heap);
-	heap->chunks->size |= FLAG_CHUNK_FREE;
-	heap->chunks->next = NULL;
-	return heap;
-}
 
 /*
  * Assign the g_arenas pointer to the best available arenas collection, i.e.
@@ -78,6 +63,9 @@ static void	assign_arena_ptr()
 	pthread_mutex_unlock(&best_arenas->mutex);
 }
 
+/*
+ * Do a sorted insert of given chunk in given chunks linked list. Sort is based on chunk address.
+ */
 static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 {
 	if (*list == NULL || *list > chunk)
@@ -118,9 +106,8 @@ void	*MALLOC(size_t size)
 	}
 	else
 	{
-		int		page_size		= getpagesize();
 		size_t	header_size 	= ALIGN_MALLOC(sizeof(t_chunk));
-		size_t	aligned_size	= ALIGN_TO(size + header_size, page_size);
+		size_t	aligned_size	= ALIGN_MALLOC(size + header_size);
 
 		t_chunk *chunk = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
 			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);

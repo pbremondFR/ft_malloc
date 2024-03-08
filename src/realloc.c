@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 17:50:53 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/05 21:37:28 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/07 23:11:04 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,20 @@ void	*REALLOC(void *ptr, size_t size)
 		return NULL;
 	}
 
-	void	*newptr;
-	t_chunk *chunk = ptr - sizeof(*chunk);
-	size_t old_size = (chunk->size & CHUNK_SIZE_MASK);
+	size_t	aligned_chunk_sz	= ALIGN_MALLOC(sizeof(t_chunk));
+	t_chunk *chunk				= ptr - aligned_chunk_sz;
+	size_t	old_size			= (chunk->size & CHUNK_SIZE_MASK);
 
 	dbg_print("With size %zu & old size %zu\n", size, old_size);
 
-	newptr = MALLOC(size);
+	void *newptr = MALLOC(size);
 	if (newptr == NULL)
 	{
 		FREE(ptr);
 		return (NULL);
 	}
-	if (old_size - sizeof(t_chunk) < size)
-		ft_memcpy(newptr, ptr, old_size - sizeof(t_chunk));
+	if (old_size - aligned_chunk_sz < size)
+		ft_memcpy(newptr, ptr, old_size - aligned_chunk_sz);
 	else
 		ft_memcpy(newptr, ptr, size);
 	FREE(ptr);
