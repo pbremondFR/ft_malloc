@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 22:27:42 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 22:10:50 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,27 @@ int main()
 
 	print_settings();
 
+	newtest();
+	{
+		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *small1 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		void *large1 = MALLOC(SMALL_ALLOC_MAX_SZ * 2);
+		show_alloc_mem();
+		void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *small2 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		void *large2 = MALLOC(SMALL_ALLOC_MAX_SZ * 2);
+		show_alloc_mem();
+		printf("Tiny 1:  %p, Tiny 2:  %p\n", tiny1, tiny2);
+		printf("Small 1: %p, Small 2: %p\n", small1, small2);
+		printf("Large 1: %p, Large 2: %p\n", large1, large2);
+		FREE(tiny1);
+		FREE(tiny2);
+		FREE(small1);
+		FREE(small2);
+		FREE(large1);
+		FREE(large2);
+	}
+	return 0;
 	newtest();
 	{
 		for (int i = 0; i < 10; ++i)

@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 18:22:53 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 22:28:48 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,15 +105,27 @@ void	*MALLOC(size_t size)
 		t_chunk *chunk = alloc_chunk_from_heaps(&g_arenas->tiny_heaps, size,
 			options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
 		pthread_mutex_unlock(&g_arenas->mutex);
-		return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
+		if (!chunk)
+		{
+			errno = ENOMEM;
+			return NULL;
+		}
+		else
+			return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
 	}
 	else if (size <= (size_t)options.small_alloc_max_sz)
 	{
 		pthread_mutex_lock(&g_arenas->mutex);
 		t_chunk *chunk = alloc_chunk_from_heaps(&g_arenas->small_heaps, size,
-			options.small_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+			options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
 		pthread_mutex_unlock(&g_arenas->mutex);
-		return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
+		if (!chunk)
+		{
+			errno = ENOMEM;
+			return NULL;
+		}
+		else
+			return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
 	}
 	else
 	{

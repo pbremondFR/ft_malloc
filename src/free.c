@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 18:19:32 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/08 22:20:26 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,13 @@ void	FREE(void *ptr)
 	if (chunk->size & FLAG_CHUNK_MMAPPED)
 	{
 		remove_large_chunk_from_list(chunk);
-		if (munmap(chunk, size) != 0)
+		if (munmap(chunk, size) != 0) {
 			dbg_print("OH FUCK\n");
+		}
 	}
 	else
 	{
-
+		return;
 	}
 	// dbg_print(YEL"OUT OF FREE"RESET"\n");
 }
