@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 22:10:50 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/09 02:12:48 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,15 @@ int main()
 		FREE(small2);
 		FREE(large1);
 		FREE(large2);
+	}
+	newtest();
+	{
+		void *mem[SMALL_HEAP_MIN_ELEM * 8];
+		for (size_t i = 0; i < SIZEOF_ARRAY(mem); ++i)
+			mem[i] = MALLOC(SMALL_ALLOC_MAX_SZ);
+		for (size_t i = 0; i < SIZEOF_ARRAY(mem); ++i)
+			FREE(mem[i]);
+		show_alloc_mem();
 	}
 	return 0;
 	newtest();
