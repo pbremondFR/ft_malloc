@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 22:28:48 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:53:54 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,10 @@ static void	assign_arena_ptr()
 		if (arenas->num_threads == 0)
 		{
 			++arenas->num_threads;
-			arenas->tiny_heaps = create_new_heap(options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
-			arenas->small_heaps = create_new_heap(options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
+			arenas->tiny_heaps = create_new_heap(
+				(options.tiny_alloc_max_sz + sizeof(t_chunk)) * TINY_HEAP_MIN_ELEM);
+			arenas->small_heaps = create_new_heap(
+				(options.small_alloc_max_sz + sizeof(t_chunk)) * SMALL_HEAP_MIN_ELEM);
 			g_arenas = arenas;
 			pthread_mutex_unlock(&arenas->mutex);
 			return;
@@ -56,12 +58,14 @@ static void	assign_arena_ptr()
 		}
 	}
 	pthread_mutex_lock(&best_arenas->mutex);
-	g_arenas = best_arenas;
 	if (++best_arenas->num_threads == 1)	// First thread to obtain this arena
 	{
-		best_arenas->tiny_heaps = create_new_heap(options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
-		best_arenas->small_heaps = create_new_heap(options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
+		best_arenas->tiny_heaps = create_new_heap(
+			(options.tiny_alloc_max_sz + sizeof(t_chunk)) * TINY_HEAP_MIN_ELEM);
+		best_arenas->small_heaps = create_new_heap(
+			(options.small_alloc_max_sz + sizeof(t_chunk)) * SMALL_HEAP_MIN_ELEM);
 	}
+	g_arenas = best_arenas;
 	pthread_mutex_unlock(&best_arenas->mutex);
 }
 

@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/09 02:12:48 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:52:21 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,40 @@ int main()
 
 	print_settings();
 
+	newtest();
+	{
+		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny5 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		show_alloc_mem_ex();
+		FREE(tiny3);
+		show_alloc_mem_ex();
+		FREE(tiny4);
+		show_alloc_mem_ex();
+		FREE(tiny2);
+		show_alloc_mem_ex();
+		FREE(tiny1);
+		show_alloc_mem_ex();
+		dbg_print(CYNHB"Last free"RESET"\n");
+		FREE(tiny5);
+		show_alloc_mem_ex();
+	}
+	newtest();
+	{
+		// void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		// void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		// void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		// void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		// void *tiny5 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		// show_alloc_mem_ex();
+		// FREE(tiny3);
+		// show_alloc_mem_ex();
+		// tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
+		// show_alloc_mem_ex();
+	}
+	return 0;
 	newtest();
 	{
 		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);

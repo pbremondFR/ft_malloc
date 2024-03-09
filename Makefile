@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/08 02:40:35 by pbremond         ###   ########.fr        #
+#    Updated: 2024/03/09 19:44:21 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,7 +47,7 @@ INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
 TEST_DIR = tester
 
-CC = gcc
+# CC = gcc
 CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc -fvisibility=hidden -march=native $(INCLUDES)
 
 LIBFT := libft.a
@@ -95,7 +95,7 @@ MANDATORY_OBJ = $(subst $(SRC_DIR)/, $(OBJ_DIR)/, $(patsubst %.c, %.o, $(SRC_MAN
 # ============================================================================ #
 
 # Source files exclusive to bonus part
-SRC_BONUS =	$(SRC_COMMON) malloc_options_bonus.c
+SRC_BONUS =	$(SRC_COMMON) malloc_options_bonus.c show_alloc_mem_ex.c
 
 SRC_BONUS_PLUS_PATH = $(addprefix $(SRC_DIR)/, $(SRC_BONUS))
 BONUS_OBJ = $(subst $(SRC_DIR)/, $(OBJ_DIR)/, $(patsubst %.c, %.o, $(SRC_BONUS_PLUS_PATH)))

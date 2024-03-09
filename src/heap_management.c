@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/09 02:35:44 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:02:32 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,23 +144,35 @@ t_chunk	*find_best_chunk_for_alloc(t_heap const *heaps, size_t req_size)
 
 static void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
 {
+	char buf[128];
 	size_t new_size = ALIGN_MALLOC(req_size + sizeof(t_chunk));
 	// If new chunk size doesn't leave enough the minimum amount of space for next chunk,
 	// do nothing
 	if (chunk_sz(chunk) - new_size < ALIGN_MALLOC(sizeof(t_chunk) + MALLOC_ALIGNMENT))
+	{
+		snprintf(buf, sizeof(buf), BLUHB"Can't shrink chunk"RESET"\n"BLUHB"Chunk size: %zu, req_size: %zu"RESET"\n", chunk_sz(chunk), req_size);
+		ft_putstr(buf);
 		return;
+	}
+	else
+	{
+		snprintf(buf, sizeof(buf), GRNHB"Shrinking chunk"RESET"\n"GRNHB"Chunk size: %zu, req_size: %zu"RESET"\n", chunk_sz(chunk), req_size);
+		ft_putstr(buf);
+	}
 
 	// Else, divide chunk
 	t_chunk *new_next_chunk = (void*)chunk + new_size;
 	new_next_chunk->next = chunk->next;
 	new_next_chunk->size = (chunk_sz(chunk) - new_size) | FLAG_CHUNK_FREE;
+
 	if (!new_next_chunk->next)
 		ft_putstr(BRED"No next chunk??"RESET"\n");
 	else
 		ft_putstr(BGRN"Yes next chunk"RESET"\n");
-	if (new_next_chunk->next && !(new_next_chunk->size & FLAG_CHUNK_PREV_FREE))
+	if (new_next_chunk->next && !(new_next_chunk->next->size & FLAG_CHUNK_PREV_FREE))
 		ft_putstr(REDB"We fucked up"RESET"\n");
 		// assert(new_next_chunk->next->size & FLAG_CHUNK_PREV_FREE);
+
 	size_t *new_trailing_sz_tag = (void*)new_next_chunk + chunk_sz(new_next_chunk) - sizeof(size_t);
 	*new_trailing_sz_tag = chunk_sz(new_next_chunk);
 

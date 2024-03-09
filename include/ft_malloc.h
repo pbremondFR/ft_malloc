@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:18:42 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/05 21:29:50 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/09 19:33:49 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,5 +39,6 @@ void	*REALLOC(void *ptr, size_t size);
 void	FREE(void *ptr);
 
 void	show_alloc_mem();
+void	show_alloc_mem_ex();
 
 #endif
