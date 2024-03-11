@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/09 20:52:21 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/11 19:47:24 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ static void	*routine(void *param)
 	FREE(mem_tiny);
 	FREE(mem_small);
 	FREE(mem_large);
+	ft_putstr(BBLU"Exiting thread..."RESET"\n");
 	return NULL;
 }
 
@@ -112,7 +113,6 @@ int main()
 		// tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
 		// show_alloc_mem_ex();
 	}
-	return 0;
 	newtest();
 	{
 		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
@@ -142,7 +142,6 @@ int main()
 			FREE(mem[i]);
 		show_alloc_mem();
 	}
-	return 0;
 	newtest();
 	{
 		for (int i = 0; i < 10; ++i)
@@ -195,9 +194,13 @@ int main()
 			pthread_create(&threads[i], NULL, routine, NULL);
 		// All threads allocate and wait for us to print memory before freeing
 		sleep(1);
-		show_alloc_mem();
+		// show_alloc_mem();
 		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
-			pthread_join(threads[i], NULL);
+		{
+			ft_putstr("COUCOU 1\n");
+			pthread_join(threads[i], NULL); // FIXME: Segfault, wtf???
+			ft_putstr("COUCOU 2\n");
+		}
 	}
 	newtest();
 	{

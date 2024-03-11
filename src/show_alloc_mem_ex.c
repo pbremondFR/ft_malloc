@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/09 19:31:33 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/09 21:04:01 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:25:55 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,22 +66,16 @@ void	show_alloc_mem_ex()
 	char	buf[256] = {0};
 	size_t	sum = 0;
 
-	for (unsigned int i = 0; i < SIZEOF_ARRAY(g_malloc_internals.arenas); ++i)
-	{
-		t_malloc_arenas *arenas = &g_malloc_internals.arenas[i];
-		if (arenas->num_threads == 0)
-			continue;
-		snprintf(buf, sizeof(buf), "\nArena %d:\n", i);
-		ft_putstr(buf);
+	t_malloc_arenas *arenas = &g_malloc_internals.arenas;
 
-		pthread_mutex_lock(&arenas->mutex);
-		ft_putstr("TINY:\n");
-		sum += print_allocs_from_heaps(arenas->tiny_heaps);
-		ft_putstr("SMALL:\n");
-		sum += print_allocs_from_heaps(arenas->small_heaps);
-		sum += print_large_allocs(arenas->big_allocs);
-		pthread_mutex_unlock(&arenas->mutex);
-	}
+	pthread_mutex_lock(&arenas->mutex);
+	ft_putstr("TINY:\n");
+	sum += print_allocs_from_heaps(arenas->tiny_heaps);
+	ft_putstr("SMALL:\n");
+	sum += print_allocs_from_heaps(arenas->small_heaps);
+	sum += print_large_allocs(arenas->big_allocs);
+	pthread_mutex_unlock(&arenas->mutex);
+
 	snprintf(buf, sizeof(buf), "Total: %zu\n", sum);
 	ft_putstr(buf);
 }

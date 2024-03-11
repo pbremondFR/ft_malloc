@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/09 20:53:54 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/11 19:48:50 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,53 +20,27 @@
 #include <sys/mman.h>
 #include <stdbool.h>
 
-/*
- * Assign the g_arenas pointer to the best available arenas collection, i.e.
- * the one with the least amount of threads using it.
- */
-static void	assign_arena_ptr()
+static bool	init_arenas(t_malloc_options const *options)
 {
-	ft_putstr(CYN"Assigning arenas ptr"RESET"\n");
+	ft_putstr(CYN"Init arenas"RESET"\n");
+	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
+	// Other thread already init while we were waiting for mutex, skip it
+	if (g_malloc_internals.arenas.is_init == true)
+		return true;
 
-	t_malloc_arenas		*best_arenas	= &g_malloc_internals.arenas[0];
-	size_t				min_threads		= SIZE_MAX;
-	t_malloc_options	options			= g_malloc_internals.options;
+	t_heap *tiny_heap = create_new_heap(
+		(options->tiny_alloc_max_sz + sizeof(t_chunk)) * TINY_HEAP_MIN_ELEM);
+	t_heap *small_heap = create_new_heap(
+		(options->small_alloc_max_sz + sizeof(t_chunk)) * SMALL_HEAP_MIN_ELEM);
 
-	for (unsigned int i = 0; i < NUM_ARENAS; ++i)
-	{
-		t_malloc_arenas *arenas = &g_malloc_internals.arenas[i];
-		pthread_mutex_lock(&arenas->mutex);
-		if (arenas->num_threads == 0)
-		{
-			++arenas->num_threads;
-			arenas->tiny_heaps = create_new_heap(
-				(options.tiny_alloc_max_sz + sizeof(t_chunk)) * TINY_HEAP_MIN_ELEM);
-			arenas->small_heaps = create_new_heap(
-				(options.small_alloc_max_sz + sizeof(t_chunk)) * SMALL_HEAP_MIN_ELEM);
-			g_arenas = arenas;
-			pthread_mutex_unlock(&arenas->mutex);
-			return;
-		}
-		else
-		{
-			if (arenas->num_threads < min_threads)
-			{
-				min_threads = arenas->num_threads;
-				best_arenas = arenas;
-			}
-			pthread_mutex_unlock(&arenas->mutex);
-		}
-	}
-	pthread_mutex_lock(&best_arenas->mutex);
-	if (++best_arenas->num_threads == 1)	// First thread to obtain this arena
-	{
-		best_arenas->tiny_heaps = create_new_heap(
-			(options.tiny_alloc_max_sz + sizeof(t_chunk)) * TINY_HEAP_MIN_ELEM);
-		best_arenas->small_heaps = create_new_heap(
-			(options.small_alloc_max_sz + sizeof(t_chunk)) * SMALL_HEAP_MIN_ELEM);
-	}
-	g_arenas = best_arenas;
-	pthread_mutex_unlock(&best_arenas->mutex);
+	if (!tiny_heap || !small_heap)
+		return false;
+
+	g_malloc_internals.arenas.tiny_heaps = tiny_heap;
+	g_malloc_internals.arenas.small_heaps = small_heap;
+	g_malloc_internals.arenas.is_init = true;
+	pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
+	return true;
 }
 
 /*
@@ -87,16 +61,35 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 	head->next = chunk;
 }
 
+// TESTME
+static void	*malloc_tiny_or_small(t_heap **heaps, size_t req_size, t_malloc_options const *options)
+{
+	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
+	t_chunk *chunk = alloc_chunk_from_heaps(heaps, req_size,
+		options->tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+	pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
+	if (!chunk)
+	{
+		errno = ENOMEM;
+		return NULL;
+	}
+	else
+		return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
+}
+
 SHARED_LIB_EXPORT
 void	*MALLOC(size_t size)
 {
 	// ft_putstr(GRN"+-------------\n|IN MALLOC"RESET"\n");
 	if (unlikely(g_malloc_internals.loaded_options == false))
 		malloc_load_options();
-	if (unlikely(g_arenas == NULL))
-		assign_arena_ptr();
-
 	t_malloc_options options = g_malloc_internals.options;
+	if (unlikely(g_malloc_internals.arenas.is_init == false && !init_arenas(&options)))
+	{
+		errno = ENOMEM;
+		return NULL;
+	}
+
 	if (size > PTRDIFF_MAX)
 	{
 		dbg_print("|Bad size, enomem and shit\n");
@@ -105,10 +98,10 @@ void	*MALLOC(size_t size)
 	}
 	else if (size <= (size_t)options.tiny_alloc_max_sz)
 	{
-		pthread_mutex_lock(&g_arenas->mutex);
-		t_chunk *chunk = alloc_chunk_from_heaps(&g_arenas->tiny_heaps, size,
+		pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
+		t_chunk *chunk = alloc_chunk_from_heaps(&g_malloc_internals.arenas.tiny_heaps, size,
 			options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
-		pthread_mutex_unlock(&g_arenas->mutex);
+		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		if (!chunk)
 		{
 			errno = ENOMEM;
@@ -119,10 +112,10 @@ void	*MALLOC(size_t size)
 	}
 	else if (size <= (size_t)options.small_alloc_max_sz)
 	{
-		pthread_mutex_lock(&g_arenas->mutex);
-		t_chunk *chunk = alloc_chunk_from_heaps(&g_arenas->small_heaps, size,
+		pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
+		t_chunk *chunk = alloc_chunk_from_heaps(&g_malloc_internals.arenas.small_heaps, size,
 			options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
-		pthread_mutex_unlock(&g_arenas->mutex);
+		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		if (!chunk)
 		{
 			errno = ENOMEM;
@@ -149,9 +142,9 @@ void	*MALLOC(size_t size)
 		chunk->size |= FLAG_CHUNK_MMAPPED;
 		chunk->next = NULL;
 		/* Append chunk to list of big allocs. Required by subject for debugging functions */
-		pthread_mutex_unlock(&g_arenas->mutex);
-		insert_chunk_in_list(&g_arenas->big_allocs, chunk);
-		pthread_mutex_unlock(&g_arenas->mutex);
+		pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
+		insert_chunk_in_list(&g_malloc_internals.arenas.big_allocs, chunk);
+		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		// ft_putstr(GRN"|OUT OF MALLOC\n+-------------"RESET"\n");
 		return (char*)chunk + header_size;
 	}

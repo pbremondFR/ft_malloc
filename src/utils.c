@@ -6,12 +6,17 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 20:23:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 18:52:17 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:21:58 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include "libft.h"
+
+/*
+ * No, I won't recode snprintf just for this stupid project, fuck you, have some
+ * piscine functions.
+ */
 
 /*
  * Apparently it's hotly debated whether it's GCC's or glibc's fault that
@@ -39,6 +44,17 @@ void	rec_putnbr(int n)
 	}
 	else
 		ft_putchar(u_nb + '0');
+}
+
+void	rec_putsize_t(size_t n)
+{
+	if (n > 9)
+	{
+		rec_putsize_t(n / 10);
+		rec_putsize_t(n % 10);
+	}
+	else
+		ft_putchar(n + '0');
 }
 
 // Takes a number in decimal form, and converts it to the given base.

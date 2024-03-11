@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 21:48:09 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:20:22 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ inline size_t	chunk_sz(const t_chunk *c)			{ return c->size & CHUNK_SIZE_MASK; }
 inline size_t	chunk_alloc_sz(const t_chunk *c)	{ return chunk_sz(c) - sizeof(*c); }
 
 void	rec_putnbr(int n);
-void	rec_putnbr_base(int n, const char *base);
+void	rec_putsize_t(size_t n);
+void	rec_putnbr_base(long n, const char *base);
 
 void	malloc_load_options();
 t_heap	*create_new_heap(size_t heap_size);

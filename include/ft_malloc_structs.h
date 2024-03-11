@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 00:27:48 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/08 18:14:45 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:43:55 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ typedef struct s_arena
 
 typedef struct
 {
-	atomic_size_t	num_threads;
+	atomic_bool		is_init;
 	t_mutex			mutex;
 	t_heap			*tiny_heaps;
 	t_heap			*small_heaps;
@@ -68,7 +68,7 @@ typedef _Atomic t_malloc_options atomic_options;
 
 typedef struct
 {
-	t_malloc_arenas	arenas[NUM_ARENAS];	// Array of arenas
+	t_malloc_arenas	arenas;
 	// Put other coolstuff/options for malloc in there, for debugging or
 	// bonuses like dynamically adjustable options
 	atomic_bool		loaded_options;
@@ -78,7 +78,7 @@ typedef struct
 
 extern t_malloc_internals	g_malloc_internals;
 
-_Thread_local
-extern t_malloc_arenas		*g_arenas;
+// _Thread_local
+// extern t_malloc_arenas		*g_arenas;
 
 #endif
