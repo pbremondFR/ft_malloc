@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/10 20:20:22 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/15 14:37:37 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@
 		_a > _b ? _a : _b;			\
 	})
 
-inline size_t	chunk_sz(const t_chunk *c)			{ return c->size & CHUNK_SIZE_MASK; }
-inline size_t	chunk_alloc_sz(const t_chunk *c)	{ return chunk_sz(c) - sizeof(*c); }
+static inline size_t	chunk_sz(const t_chunk *c)			{ return c->size & CHUNK_SIZE_MASK; }
+static inline size_t	chunk_alloc_sz(const t_chunk *c)	{ return chunk_sz(c) - sizeof(*c); }
 
 void	rec_putnbr(int n);
 void	rec_putsize_t(size_t n);

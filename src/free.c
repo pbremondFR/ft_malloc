@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/11 18:53:23 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/15 14:55:13 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,17 @@ SHARED_LIB_EXPORT
 void	FREE(void *ptr)
 {
 	// dbg_print(YEL"IN FREE"RESET"\n");
-	if (ptr == NULL)
+	const uintptr_t	pagesize = getpagesize();
+	char buf[256];
+	snprintf(buf, sizeof(buf), "Pagesize: %zu, as ptr: %p\n", pagesize, (void*)pagesize);
+	// ft_putstr(buf);
+
+	if (ptr < (void*)pagesize)
+	// if (ptr == NULL)
 		return;
 	t_chunk *chunk = ptr - ALIGN_MALLOC(sizeof(*chunk));
+	snprintf(buf, sizeof(buf), "Freeing %p (chunk %p)\n", ptr, chunk);
+	// ft_putstr(buf);
 
 	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 	if (chunk->size & FLAG_CHUNK_MMAPPED)

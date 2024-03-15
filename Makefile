@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/09 19:44:21 by pbremond         ###   ########.fr        #
+#    Updated: 2024/03/15 14:48:35 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -63,9 +63,10 @@ ifdef BUILD_DEBUG
 	TGT_DIR := debug
 	CFLAGS += -gdwarf-4 -Og -fno-omit-frame-pointer
 	LIBFT_BUILD_ARGS += BUILD_DEBUG=1
+	CPPFLAGS += -DNDEBUG
 	ifndef VALGRIND
-		CFLAGS += -fsanitize=address
-		LDFLAGS += -fsanitize=address
+		CFLAGS += -fsanitize=undefined
+		LDFLAGS += -fsanitize=undefined
 	endif
 else
 	OBJ_DIR := objs
@@ -117,7 +118,9 @@ TARGET_BONUS = $(TGT_DIR)/libft_malloc_$(HOSTTYPE)_bonus.so
 
 TESTER_TARGET = $(TGT_DIR)/test_ft_malloc
 
-all: $(TARGET) $(TESTER_TARGET)
+all: bonus
+
+mandatory: $(TARGET) $(TESTER_TARGET)
 
 bonus: $(TARGET_BONUS) $(TESTER_TARGET)
 

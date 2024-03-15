@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/11 19:48:50 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/15 14:55:31 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 }
 
 // TESTME
-static void	*malloc_tiny_or_small(t_heap **heaps, size_t req_size, t_malloc_options const *options)
+/* static */ void	*malloc_tiny_or_small(t_heap **heaps, size_t req_size, t_malloc_options const *options)
 {
 	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 	t_chunk *chunk = alloc_chunk_from_heaps(heaps, req_size,

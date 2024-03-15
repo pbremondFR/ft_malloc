@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/11 19:47:24 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/03/15 14:58:53 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,13 +194,14 @@ int main()
 			pthread_create(&threads[i], NULL, routine, NULL);
 		// All threads allocate and wait for us to print memory before freeing
 		sleep(1);
-		// show_alloc_mem();
+		show_alloc_mem_ex();
 		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
 		{
 			ft_putstr("COUCOU 1\n");
 			pthread_join(threads[i], NULL); // FIXME: Segfault, wtf???
 			ft_putstr("COUCOU 2\n");
 		}
+		show_alloc_mem_ex();
 	}
 	newtest();
 	{
