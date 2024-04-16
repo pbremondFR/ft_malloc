@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/15 14:58:53 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:27:57 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,11 @@ static void	*routine(void *param)
 	void *mem_small = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
 	void *mem_large = MALLOC(SMALL_ALLOC_MAX_SZ * 2);
 	sleep(2);
+
+	char buf[128] = {0};
+	snprintf(buf, sizeof(buf), "### Tiny: %p, Small: %p, Large: %p\n", mem_tiny, mem_small, mem_large);
+	ft_putstr(buf);
+
 	FREE(mem_tiny);
 	FREE(mem_small);
 	FREE(mem_large);
@@ -203,18 +208,18 @@ int main()
 		}
 		show_alloc_mem_ex();
 	}
-	newtest();
-	{
-		pthread_t	threads[64];
+	// newtest();
+	// {
+	// 	pthread_t	threads[64];
 
-		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
-			pthread_create(&threads[i], NULL, routine, NULL);
-		// All threads allocate and wait for us to print memory before freeing
-		sleep(1);
-		show_alloc_mem();
-		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
-			pthread_join(threads[i], NULL);
-	}
+	// 	for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+	// 		pthread_create(&threads[i], NULL, routine, NULL);
+	// 	// All threads allocate and wait for us to print memory before freeing
+	// 	sleep(1);
+	// 	show_alloc_mem();
+	// 	for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+	// 		pthread_join(threads[i], NULL);
+	// }
 
 	return 0;
 }

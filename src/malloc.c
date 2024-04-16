@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/15 14:55:31 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:33:02 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,11 +62,10 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 }
 
 // TESTME
-/* static */ void	*malloc_tiny_or_small(t_heap **heaps, size_t req_size, t_malloc_options const *options)
+/* static */ void	*malloc_tiny_or_small(t_heap **heaps, size_t req_size, size_t min_heap_size)
 {
 	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
-	t_chunk *chunk = alloc_chunk_from_heaps(heaps, req_size,
-		options->tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+	t_chunk *chunk = alloc_chunk_from_heaps(heaps, req_size, min_heap_size);
 	pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 	if (!chunk)
 	{
@@ -80,6 +79,8 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 SHARED_LIB_EXPORT
 void	*MALLOC(size_t size)
 {
+	char buf[256] = {0};
+
 	// ft_putstr(GRN"+-------------\n|IN MALLOC"RESET"\n");
 	if (unlikely(g_malloc_internals.loaded_options == false))
 		malloc_load_options();
@@ -96,33 +97,25 @@ void	*MALLOC(size_t size)
 		errno = ENOMEM;
 		return NULL;
 	}
+	else if (size == 0)
+	{
+		return NULL;
+	}
 	else if (size <= (size_t)options.tiny_alloc_max_sz)
 	{
-		pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
-		t_chunk *chunk = alloc_chunk_from_heaps(&g_malloc_internals.arenas.tiny_heaps, size,
-			options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
-		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
-		if (!chunk)
-		{
-			errno = ENOMEM;
-			return NULL;
-		}
-		else
-			return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
+		void *mem = malloc_tiny_or_small(&g_malloc_internals.arenas.tiny_heaps,
+			size, options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+		snprintf(buf, sizeof(buf), "Returning tiny mem ptr %p\n", mem);
+		ft_putstr(buf);
+		return mem;
 	}
 	else if (size <= (size_t)options.small_alloc_max_sz)
 	{
-		pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
-		t_chunk *chunk = alloc_chunk_from_heaps(&g_malloc_internals.arenas.small_heaps, size,
-			options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
-		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
-		if (!chunk)
-		{
-			errno = ENOMEM;
-			return NULL;
-		}
-		else
-			return (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
+		void *mem = malloc_tiny_or_small(&g_malloc_internals.arenas.small_heaps,
+			size, options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
+		snprintf(buf, sizeof(buf), "Returning small mem ptr %p\n", mem);
+		ft_putstr(buf);
+		return mem;
 	}
 	else
 	{
