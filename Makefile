@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/03/15 14:48:35 by pbremond         ###   ########.fr        #
+#    Updated: 2024/04/17 16:42:25 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,7 +61,7 @@ LIBFT_BUILD_ARGS := CFLAGS=-std=gnu17 CC=$(CC)
 ifdef BUILD_DEBUG
 	OBJ_DIR := objs_debug
 	TGT_DIR := debug
-	CFLAGS += -gdwarf-4 -Og -fno-omit-frame-pointer
+	CFLAGS += -gdwarf-4 -O0 -fno-omit-frame-pointer
 	LIBFT_BUILD_ARGS += BUILD_DEBUG=1
 	CPPFLAGS += -DNDEBUG
 	ifndef VALGRIND
@@ -140,6 +140,7 @@ $(TESTER_TARGET): $(LIBFT_PATH)/$(LIBFT) $(TEST_OBJ)
 	@echo "$(_PURPLE)Linking $(TESTER_TARGET)$(_COLOR_RESET)"
 	@mkdir -p $(@D)
 	@$(CC) $(TEST_OBJ) -o $(TESTER_TARGET) $(LDFLAGS) $(LDLIBS) -lft_malloc
+#@$(CC) $(TEST_OBJ) -o $(TESTER_TARGET) $(LDFLAGS) $(LDLIBS) -lother_malloc
 
 $(LIBFT_PATH)/$(LIBFT):
 	@echo "$(_PURPLE)Making $(basename $(LIBFT))$(_COLOR_RESET)"

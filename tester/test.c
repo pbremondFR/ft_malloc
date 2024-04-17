@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/16 16:27:57 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 16:46:00 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@
 #include <stdbool.h>
 
 #include <pthread.h>
+
+// #define SHOW_ALLOC_MEM show_alloc_mem
+#define SHOW_ALLOC_MEM show_alloc_mem_ex
 
 __attribute__((unused))
 static void	do_static_asserts()
@@ -92,31 +95,31 @@ int main()
 		void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
 		void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
 		void *tiny5 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 		FREE(tiny3);
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 		FREE(tiny4);
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 		FREE(tiny2);
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 		FREE(tiny1);
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 		dbg_print(CYNHB"Last free"RESET"\n");
 		FREE(tiny5);
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 	}
 	newtest();
 	{
-		// void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-		// void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-		// void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-		// void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-		// void *tiny5 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-		// show_alloc_mem_ex();
-		// FREE(tiny3);
-		// show_alloc_mem_ex();
-		// tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
-		// show_alloc_mem_ex();
+		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny5 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		FREE(tiny3);
+		SHOW_ALLOC_MEM();
+		tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
+		SHOW_ALLOC_MEM();
 	}
 	newtest();
 	{
@@ -199,27 +202,27 @@ int main()
 			pthread_create(&threads[i], NULL, routine, NULL);
 		// All threads allocate and wait for us to print memory before freeing
 		sleep(1);
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
 		{
 			ft_putstr("COUCOU 1\n");
 			pthread_join(threads[i], NULL); // FIXME: Segfault, wtf???
 			ft_putstr("COUCOU 2\n");
 		}
-		show_alloc_mem_ex();
+		SHOW_ALLOC_MEM();
 	}
-	// newtest();
-	// {
-	// 	pthread_t	threads[64];
+	newtest();
+	{
+		pthread_t	threads[64];
 
-	// 	for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
-	// 		pthread_create(&threads[i], NULL, routine, NULL);
-	// 	// All threads allocate and wait for us to print memory before freeing
-	// 	sleep(1);
-	// 	show_alloc_mem();
-	// 	for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
-	// 		pthread_join(threads[i], NULL);
-	// }
-
+		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+			pthread_create(&threads[i], NULL, routine, NULL);
+		// All threads allocate and wait for us to print memory before freeing
+		sleep(1);
+		SHOW_ALLOC_MEM();
+		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
+			pthread_join(threads[i], NULL);
+	}
+	SHOW_ALLOC_MEM();
 	return 0;
 }

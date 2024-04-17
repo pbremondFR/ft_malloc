@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/09 19:31:33 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/10 20:25:55 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 16:45:04 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static size_t	print_large_allocs(const t_chunk *chunks)
 	for (; chunks != NULL; chunks = chunks->next)
 	{
 		const void *mem = (char*)chunks + sizeof(t_chunk);
-		size_t size = (chunks->size & CHUNK_SIZE_MASK) - sizeof(t_chunk);
+		size_t size = chunk_alloc_sz(chunks);
 		sum += size;
 		snprintf(buf, sizeof(buf), "%p - %p : %zu bytes\n", mem, mem + size, size);
 		ft_putstr(buf);

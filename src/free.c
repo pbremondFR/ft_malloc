@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/16 16:25:03 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 17:03:41 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,18 +38,15 @@ static void	remove_large_chunk_from_list(t_chunk *chunk)
 
 static void	free_chunk(t_chunk *chunk)
 {
-	char buf[256];
 	bool collapsed_prev = false;
 	bool collapsed_next = false;
-	snprintf(buf, sizeof(buf), "chunk: %p, chunk->next: %p, chunk size %zu (alloced %zu)\n",
+	tarace("chunk: %p, chunk->next: %p, chunk size %zu (alloced %zu)\n",
 		chunk, chunk->next, chunk_sz(chunk), chunk_alloc_sz(chunk));
-	ft_putstr(buf);
 
 	if (chunk_alloc_sz(chunk) > SMALL_ALLOC_MAX_SZ)
 	{
-		snprintf(buf, sizeof(buf), REDB"Fucking bad chunk size (%zu), corrupted or something???"RESET"\n",
+		tarace(REDB"Fucking bad chunk alloc size (%zu), corrupted or something???"RESET"\n",
 			chunk_alloc_sz(chunk));
-		ft_putstr(buf);
 		return;
 	}
 
@@ -64,27 +61,28 @@ static void	free_chunk(t_chunk *chunk)
 		chunk->next = chunk->next->next;
 	}
 
-	if (chunk->next)	// Set tag to indicate that previous chunk is free
-		chunk->next->size |= FLAG_CHUNK_PREV_FREE;
-
 	// Collapse previous chunk if it's free
 	if (chunk->size & FLAG_CHUNK_PREV_FREE)
 	{
 		// dbg_print(YEL"Collapsing previous chunk"RESET"\n");
-		size_t	*prev_size = (void*)chunk - sizeof(size_t);
-		t_chunk	*prev = (void*)chunk - *prev_size;
-		size_t flags = prev->size & ~CHUNK_SIZE_MASK;
-		prev->size = (chunk_sz(chunk) + chunk_sz(prev)) | flags;
+		const size_t *p_prev_size = (void*)chunk - sizeof(size_t);
+		const size_t prev_size = *p_prev_size;
+		tarace("prev size ptr is %p with value %zu (%#x)\n", p_prev_size, prev_size, prev_size);
+		t_chunk	*prev = (void*)chunk - prev_size;
+		// size_t flags = prev->size & ~CHUNK_SIZE_MASK;
+		prev->size = (chunk_sz(chunk) + chunk_sz(prev));
 		prev->next = chunk->next;
 		chunk = prev;
 		collapsed_prev = true;
 	}
+
 	chunk->size |= FLAG_CHUNK_FREE;
-	size_t *trailing_size_tag = (void*)chunk + chunk_sz(chunk);
-	trailing_size_tag--;
-	snprintf(buf, sizeof(buf), "Collapsed %d/%d, chunk: %p, chunk size: %zu(%#lx), trailing size tag: %p\n",
+	if (chunk->next)	// Set tag to indicate that previous chunk is free
+		chunk->next->size |= FLAG_CHUNK_PREV_FREE;
+
+	size_t *trailing_size_tag = (void*)chunk + chunk_sz(chunk) - sizeof(size_t);
+	tarace("Collapsed %d/%d, chunk: %p, chunk size: %zu(%#lx), trailing size tag: %p\n",
 		collapsed_prev, collapsed_next, chunk, chunk_sz(chunk), chunk_sz(chunk), trailing_size_tag);
-	ft_putstr(buf);
 	*trailing_size_tag = chunk_sz(chunk);
 }
 
@@ -102,19 +100,25 @@ void	FREE(void *ptr)
 	snprintf(buf, sizeof(buf), "Pagesize: %zu, as ptr: %p\n", pagesize, (void*)pagesize);
 	// ft_putstr(buf);
 
-	if (ptr < (void*)pagesize)
-	// if (ptr == NULL)
-		return;
-	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 	t_chunk *chunk = ptr - ALIGN_MALLOC(sizeof(*chunk));
 	snprintf(buf, sizeof(buf), "Freeing %p (chunk %p)\n", ptr, chunk);
 	ft_putstr(buf);
+	if ((size_t)ptr < pagesize)
+	// if (ptr == NULL)
+	{
+		if (ptr != NULL) {
+			ft_putstr(REDB"CORRUPTED MEMORY OH NO"RESET"\n");
+			ft_putstr_fd(REDB"CORRUPTED MEMORY OH NO"RESET"\n", 2);
+		}
+		return;
+	}
+	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 
 	if (chunk->size & FLAG_CHUNK_MMAPPED)
 	{
 		remove_large_chunk_from_list(chunk);
 		if (munmap(chunk, chunk_sz(chunk)) != 0) {
-			dbg_print("OH FUCK\n");
+			tarace(BHRED"OH FUCK\n"RESET);
 		}
 	}
 	else

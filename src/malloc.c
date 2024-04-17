@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/16 16:33:02 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 16:32:44 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,13 +99,14 @@ void	*MALLOC(size_t size)
 	}
 	else if (size == 0)
 	{
+		// errno = ENOMEM;
 		return NULL;
 	}
 	else if (size <= (size_t)options.tiny_alloc_max_sz)
 	{
 		void *mem = malloc_tiny_or_small(&g_malloc_internals.arenas.tiny_heaps,
 			size, options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
-		snprintf(buf, sizeof(buf), "Returning tiny mem ptr %p\n", mem);
+		snprintf(buf, sizeof(buf), "Returning tiny mem ptr %p (chunk %p)\n", mem, mem + 16);
 		ft_putstr(buf);
 		return mem;
 	}
@@ -113,7 +114,7 @@ void	*MALLOC(size_t size)
 	{
 		void *mem = malloc_tiny_or_small(&g_malloc_internals.arenas.small_heaps,
 			size, options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
-		snprintf(buf, sizeof(buf), "Returning small mem ptr %p\n", mem);
+		snprintf(buf, sizeof(buf), "Returning small mem ptr %p (chunk %p)\n", mem, mem + 16);
 		ft_putstr(buf);
 		return mem;
 	}
@@ -139,6 +140,10 @@ void	*MALLOC(size_t size)
 		insert_chunk_in_list(&g_malloc_internals.arenas.big_allocs, chunk);
 		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		// ft_putstr(GRN"|OUT OF MALLOC\n+-------------"RESET"\n");
-		return (char*)chunk + header_size;
+		snprintf(buf, sizeof(buf), "Returning large mem ptr %p (chunk %p)\n", (char*)chunk + header_size, chunk);
+		ft_putstr(buf);
+		void *mem = (void*)chunk + header_size;
+		ft_bzero(mem, chunk_alloc_sz(chunk));
+		return mem;
 	}
 }

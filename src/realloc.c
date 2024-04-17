@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 17:50:53 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/07 23:11:04 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 16:37:35 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@ void	*REALLOC(void *ptr, size_t size)
 {
 	dbg_print("CALLED REALLOC\n");
 
+	errno = ENOMEM;
+	return NULL;
+
 	if (ptr == NULL)
 		return MALLOC(size);
 	else if (size == 0)
@@ -32,7 +35,8 @@ void	*REALLOC(void *ptr, size_t size)
 
 	size_t	aligned_chunk_sz	= ALIGN_MALLOC(sizeof(t_chunk));
 	t_chunk *chunk				= ptr - aligned_chunk_sz;
-	size_t	old_size			= (chunk->size & CHUNK_SIZE_MASK);
+	size_t	old_size			= chunk_sz(chunk);
+	size_t	old_alloc_size		= chunk_alloc_sz(chunk);
 
 	dbg_print("With size %zu & old size %zu\n", size, old_size);
 
@@ -42,8 +46,8 @@ void	*REALLOC(void *ptr, size_t size)
 		FREE(ptr);
 		return (NULL);
 	}
-	if (old_size - aligned_chunk_sz < size)
-		ft_memcpy(newptr, ptr, old_size - aligned_chunk_sz);
+	if (old_alloc_size < size)
+		ft_memcpy(newptr, ptr, old_alloc_size);
 	else
 		ft_memcpy(newptr, ptr, size);
 	FREE(ptr);

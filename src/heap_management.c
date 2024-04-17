@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/16 16:31:37 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 17:03:02 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,14 +167,14 @@ static void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
 	new_next_chunk->size = (chunk_sz(chunk) - new_size) | FLAG_CHUNK_FREE;
 
 	if (new_next_chunk->next && !(new_next_chunk->next->size & FLAG_CHUNK_PREV_FREE))
-		ft_putstr(REDB"We fucked up"RESET"\n");
-		// assert(new_next_chunk->next->size & FLAG_CHUNK_PREV_FREE);
+		ft_putstr(REDB"CORRUPTED: We fucked up"RESET"\n");
+	// 	// assert(new_next_chunk->next->size & FLAG_CHUNK_PREV_FREE);
 
 	size_t *new_trailing_sz_tag = (void*)new_next_chunk + chunk_sz(new_next_chunk);
 	new_trailing_sz_tag--;
 	*new_trailing_sz_tag = chunk_sz(new_next_chunk);
 
-	chunk->size = new_size | (chunk->size & ~CHUNK_SIZE_MASK);	// Keep the flags
+	chunk->size = new_size;// | (chunk->size & ~CHUNK_SIZE_MASK);	// Keep the flags
 	chunk->next = new_next_chunk;
 }
 

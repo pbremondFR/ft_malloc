@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 20:23:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/10 20:21:58 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 15:48:41 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,3 +81,13 @@ void	rec_putnbr_base(long nbr, const char *base)
 		write(1, &base[u_nb % base_len], 1);
 }
 #pragma GCC diagnostic pop
+
+void	tarace(const char * restrict fmt, ...)
+{
+	char buf[1024] = {0};
+	va_list args;
+	va_start(args, fmt);
+	(void)vsnprintf(buf, sizeof(buf), fmt, args);
+	ft_putstr(buf);
+	va_end(args);
+}

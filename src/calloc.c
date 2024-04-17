@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:33:15 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/15 14:38:03 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/17 16:36:58 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ void	*CALLOC(size_t nb_elem, size_t size)
 {
 	dbg_print("CALLED CALLOC\n");
 
+	if (nb_elem == 0 || size == 0)
+		return NULL;
 	if (SIZE_MAX / size < nb_elem)	// size_t overflow
 	{
 		errno = ENOMEM;
@@ -30,12 +32,12 @@ void	*CALLOC(size_t nb_elem, size_t size)
 	else
 	{
 		const t_malloc_options opt = g_malloc_internals.options;
-
-		void *mem = MALLOC(nb_elem * size);
+		const size_t req_alloc_sz = nb_elem * size;
+		void *mem = MALLOC(req_alloc_sz);
 		if (!mem)	// errno already set in malloc
 			return NULL;
-		if (size > (size_t)opt.small_alloc_max_sz)
-			ft_bzero(mem, nb_elem * size);	// TODO: optimize with 64-bit wide call
+		// if (req_alloc_sz <= (size_t)opt.small_alloc_max_sz)
+			ft_bzero(mem, ALIGN_MALLOC(req_alloc_sz));	// TODO: optimize with 64-bit wide call
 		return mem;
 	}
 }
