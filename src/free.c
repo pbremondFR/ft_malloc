@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/17 17:03:41 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/18 14:29:00 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ static void	free_chunk(t_chunk *chunk)
 		// dbg_print(YEL"Collapsing previous chunk"RESET"\n");
 		const size_t *p_prev_size = (void*)chunk - sizeof(size_t);
 		const size_t prev_size = *p_prev_size;
+		if (prev_size == 0)
+			tarace(REDB"ptn zbi prev size is %zu"RESET"\n", prev_size);
 		tarace("prev size ptr is %p with value %zu (%#x)\n", p_prev_size, prev_size, prev_size);
 		t_chunk	*prev = (void*)chunk - prev_size;
 		// size_t flags = prev->size & ~CHUNK_SIZE_MASK;
@@ -99,10 +101,13 @@ void	FREE(void *ptr)
 	char buf[256];
 	snprintf(buf, sizeof(buf), "Pagesize: %zu, as ptr: %p\n", pagesize, (void*)pagesize);
 	// ft_putstr(buf);
+	if ((size_t)ptr < 0x100000ull && ptr != NULL)
+		tarace(REDB"ALL FUCKED UP"RESET"\n");
 
-	t_chunk *chunk = ptr - ALIGN_MALLOC(sizeof(*chunk));
-	snprintf(buf, sizeof(buf), "Freeing %p (chunk %p)\n", ptr, chunk);
-	ft_putstr(buf);
+	// t_chunk *chunk = ptr - ALIGN_MALLOC(sizeof(t_chunk));
+	// Replace the above line with this for debug, move it below when I'm done
+	t_chunk *chunk = ptr - (ptr == NULL ? 0 : ALIGN_MALLOC(sizeof(t_chunk)));
+	tarace("Freeing %p (chunk %p)\n", ptr, chunk);
 	if ((size_t)ptr < pagesize)
 	// if (ptr == NULL)
 	{

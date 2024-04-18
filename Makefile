@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/04/17 16:42:25 by pbremond         ###   ########.fr        #
+#    Updated: 2024/04/17 17:58:00 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,7 +47,7 @@ INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
 TEST_DIR = tester
 
-# CC = gcc
+CC = gcc
 CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc -fvisibility=hidden -march=native $(INCLUDES)
 
 LIBFT := libft.a
