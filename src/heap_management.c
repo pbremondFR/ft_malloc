@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/18 13:58:14 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/18 17:05:54 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,7 @@ t_chunk	*find_best_chunk_for_alloc(t_heap const *heaps, size_t req_size)
 	return best_fit;
 }
 
-// FIXME: The big problem seems to come from here
-static void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
+void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
 {
 	char buf[128];
 	size_t new_size = ALIGN_MALLOC(req_size + sizeof(t_chunk));
@@ -162,14 +161,9 @@ static void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
 	}
 
 	// Else, divide chunk
-	size_t chunk_size = chunk_sz(chunk);
 	t_chunk *new_next_chunk = (void*)chunk + new_size;
 	new_next_chunk->next = chunk->next;
 	new_next_chunk->size = (chunk_sz(chunk) - new_size) | FLAG_CHUNK_FREE;
-
-	if (new_next_chunk->next && !(new_next_chunk->next->size & FLAG_CHUNK_PREV_FREE))
-		ft_putstr(REDB"CORRUPTED: We fucked up"RESET"\n");
-	// 	// assert(new_next_chunk->next->size & FLAG_CHUNK_PREV_FREE);
 
 	if (chunk_sz(new_next_chunk) == 0)
 		tarace(BHRED"new_next_chunk size is FUCKED, is %zu"RESET"\n", chunk_sz(new_next_chunk));

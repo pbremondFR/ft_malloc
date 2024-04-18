@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/04/17 17:58:00 by pbremond         ###   ########.fr        #
+#    Updated: 2024/04/18 14:48:44 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,7 +61,7 @@ LIBFT_BUILD_ARGS := CFLAGS=-std=gnu17 CC=$(CC)
 ifdef BUILD_DEBUG
 	OBJ_DIR := objs_debug
 	TGT_DIR := debug
-	CFLAGS += -gdwarf-4 -O0 -fno-omit-frame-pointer
+	CFLAGS += -gdwarf-4 -Og -fno-omit-frame-pointer
 	LIBFT_BUILD_ARGS += BUILD_DEBUG=1
 	CPPFLAGS += -DNDEBUG
 	ifndef VALGRIND

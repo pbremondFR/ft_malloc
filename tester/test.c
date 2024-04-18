@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/17 16:46:00 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/18 18:05:11 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,11 @@ int main()
 		SHOW_ALLOC_MEM();
 		tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
 		SHOW_ALLOC_MEM();
+		FREE(tiny1);
+		FREE(tiny2);
+		FREE(tiny3);
+		FREE(tiny4);
+		FREE(tiny5);
 	}
 	newtest();
 	{
@@ -194,6 +199,94 @@ int main()
 		FREE(foo);
 		FREE(bar);
 	}
+	// newtest();
+	// {
+	// 	void *tiny = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+	// 	SHOW_ALLOC_MEM();
+	// 	tiny = REALLOC(tiny, TINY_ALLOC_MAX_SZ);
+	// 	SHOW_ALLOC_MEM();
+	// 	FREE(tiny);
+	// }
+	// newtest();
+	// {
+	// 	void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+	// 	void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+	// 	void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+	// 	void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+	// 	SHOW_ALLOC_MEM();
+	// 	FREE(tiny3);
+	// 	tiny2 = REALLOC(tiny2, TINY_ALLOC_MAX_SZ);
+	// 	SHOW_ALLOC_MEM();
+	// 	FREE(tiny1);
+	// 	FREE(tiny2);
+	// 	FREE(tiny4);
+	// }
+	newtest();
+	{
+		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
+		void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
+		void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
+		void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
+		SHOW_ALLOC_MEM();
+		FREE(tiny1);
+		FREE(tiny3);
+		SHOW_ALLOC_MEM();
+		tiny2 = REALLOC(tiny2, TINY_ALLOC_MAX_SZ / 4 * 3);
+		SHOW_ALLOC_MEM();
+		FREE(tiny2);
+		FREE(tiny4);
+	}
+	return 0;
+	newtest();
+	{
+		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		tiny2 = REALLOC(tiny2, TINY_ALLOC_MAX_SZ / 4);
+		SHOW_ALLOC_MEM();
+		FREE(tiny1);
+		FREE(tiny2);
+		FREE(tiny3);
+	}
+	newtest();
+	{
+		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		tiny2 = REALLOC(tiny2, TINY_ALLOC_MAX_SZ * 2);
+		SHOW_ALLOC_MEM();
+		FREE(tiny1);
+		FREE(tiny2);
+		FREE(tiny3);
+	}
+	newtest();
+	{
+		void *small1 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		void *small2 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		void *small3 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		small2 = REALLOC(small2, SMALL_ALLOC_MAX_SZ * 2);
+		SHOW_ALLOC_MEM();
+		FREE(small1);
+		FREE(small2);
+		FREE(small3);
+		SHOW_ALLOC_MEM();
+	}
+	newtest();
+	{
+		void *small1 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		void *small2 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		void *small3 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		small2 = REALLOC(small2, TINY_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		FREE(small1);
+		FREE(small2);
+		FREE(small3);
+	}
+	return 0;
 	newtest();
 	{
 		pthread_t	threads[8];
@@ -205,9 +298,7 @@ int main()
 		SHOW_ALLOC_MEM();
 		for (size_t i = 0; i < SIZEOF_ARRAY(threads); ++i)
 		{
-			ft_putstr("COUCOU 1\n");
-			pthread_join(threads[i], NULL); // FIXME: Segfault, wtf???
-			ft_putstr("COUCOU 2\n");
+			pthread_join(threads[i], NULL);
 		}
 		SHOW_ALLOC_MEM();
 	}

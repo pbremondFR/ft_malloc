@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:33:15 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/17 16:36:58 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/18 14:51:15 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	*CALLOC(size_t nb_elem, size_t size)
 		void *mem = MALLOC(req_alloc_sz);
 		if (!mem)	// errno already set in malloc
 			return NULL;
-		// if (req_alloc_sz <= (size_t)opt.small_alloc_max_sz)
+		if (req_alloc_sz <= (size_t)opt.small_alloc_max_sz)
 			ft_bzero(mem, ALIGN_MALLOC(req_alloc_sz));	// TODO: optimize with 64-bit wide call
 		return mem;
 	}

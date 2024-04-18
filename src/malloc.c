@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/17 17:57:00 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/18 14:50:01 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,6 @@ void	*MALLOC(size_t size)
 	}
 	else if (size == 0)
 	{
-		// errno = ENOMEM;
 		return NULL;
 	}
 	else if (size <= (size_t)options.tiny_alloc_max_sz)

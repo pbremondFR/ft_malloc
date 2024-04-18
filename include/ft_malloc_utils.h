@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/17 16:59:50 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/18 15:30:56 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,6 @@ void	insert_heap_in_list(t_heap **list, t_heap *new_heap);
 
 t_chunk	*find_best_chunk_for_alloc(t_heap const *heaps, size_t req_size);
 t_chunk	*alloc_chunk_from_heaps(t_heap **heap_lst, size_t req_size, size_t new_heap_min_sz);
+void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size);
 
 #endif
