@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 16:39:14 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/10 20:44:09 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 19:50:27 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,7 @@ t_malloc_internals	g_malloc_internals = {
 	.options = (t_malloc_options){
 		.tiny_alloc_max_sz = TINY_ALLOC_MAX_SZ,
 		.small_alloc_max_sz = SMALL_ALLOC_MAX_SZ,
-		.optimistic_arena_assign = false,
-		.check_errors = false
+		.check_errors = 0x2
 	},
 };
 

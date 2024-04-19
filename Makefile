@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/04/19 18:20:04 by pbremond         ###   ########.fr        #
+#    Updated: 2024/04/19 20:16:11 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -65,8 +65,8 @@ ifdef BUILD_DEBUG
 	LIBFT_BUILD_ARGS += BUILD_DEBUG=1
 	CPPFLAGS += -DNDEBUG
 	ifndef VALGRIND
-		CFLAGS += -fsanitize=undefined
-		LDFLAGS += -fsanitize=undefined
+		# CFLAGS += -fsanitize=undefined
+		# LDFLAGS += -fsanitize=undefined
 	endif
 else
 	OBJ_DIR := objs
@@ -122,6 +122,7 @@ all: bonus
 
 mandatory: $(TARGET) $(TESTER_TARGET)
 
+bonus: CPPFLAGS += -DFT_BONUS
 bonus: $(TARGET_BONUS) $(TESTER_TARGET)
 
 $(TARGET): $(LIBFT_PATH)/$(LIBFT) $(MANDATORY_OBJ)

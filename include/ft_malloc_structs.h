@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 00:27:48 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/10 20:43:55 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:33:18 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ typedef pthread_mutex_t	t_mutex;
 
 typedef struct s_chunk
 {
-	// size_t			prev_size;
 	size_t			size;	// Also includes flags like GNU malloc
 	struct s_chunk	*next;	// Do NOT read when block isn't free, except for mmap'd blocks
 }	t_chunk;
@@ -60,7 +59,6 @@ typedef struct
 {
 	int	tiny_alloc_max_sz;
 	int	small_alloc_max_sz;
-	int	optimistic_arena_assign;
 	int	check_errors;
 }	t_malloc_options;
 

@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 18:22:59 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 20:17:30 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,15 +123,13 @@ void	*MALLOC(size_t size)
 			errno = ENOMEM;
 			return NULL;
 		}
-		chunk->size = aligned_size;
-		chunk->size |= FLAG_CHUNK_MMAPPED;
+		chunk->size = aligned_size | FLAG_CHUNK_MMAPPED;
 		chunk->next = NULL;
 		/* Append chunk to list of big allocs. Required by subject for debugging functions */
 		pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 		insert_chunk_in_list(&g_malloc_internals.arenas.big_allocs, chunk);
 		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		void *mem = (void*)chunk + header_size;
-		// ft_bzero(mem, chunk_alloc_sz(chunk));
 		return mem;
 	}
 }

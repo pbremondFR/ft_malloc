@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 18:11:01 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 20:26:51 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ void	insert_heap_in_list(t_heap **list, t_heap *new_heap)
 
 	// TESTME: Optimization never kicks in on WSL so I can't test it, try it at school
 	// Next is immediately adjacent, fuse the two t_heaps together
+	// FIXME: Shitty optimization, worked but makes reclaiming heaps much harder
+	// Just remove it and reclaim heaps manually after that
 	if ((void*)ALIGN_TO((char*)new_heap + new_heap->size, page_size) == new_heap->next)
 	{
 		ft_putstr("Salut c'est David Lafarge\n");
@@ -155,8 +157,7 @@ void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
 	new_next_chunk->next = chunk->next;
 	new_next_chunk->size = (chunk_sz(chunk) - new_size) | FLAG_CHUNK_FREE;
 
-	if (chunk_sz(new_next_chunk) == 0)
-		tarace(BHRED"new_next_chunk size is FUCKED, is %zu"RESET"\n", chunk_sz(new_next_chunk));
+	assert(chunk_sz(new_next_chunk) != 0);
 	size_t *new_trailing_sz_tag = (void*)new_next_chunk + chunk_sz(new_next_chunk);
 	new_trailing_sz_tag--;
 	*new_trailing_sz_tag = chunk_sz(new_next_chunk);

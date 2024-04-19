@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 17:17:42 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 20:27:18 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
@@ -286,7 +287,6 @@ int main()
 		FREE(small2);
 		FREE(small3);
 	}
-	// return 0;
 	newtest();
 	{
 		pthread_t	threads[8];
@@ -315,5 +315,14 @@ int main()
 			pthread_join(threads[i], NULL);
 	}
 	SHOW_ALLOC_MEM();
+	newtest();
+	{
+		// If you alloc more than that, page will certainly be unmapped and
+		// you WILL segfault. This gives you a chance to hit a mapped page
+		// and hit the double free warning instead.
+		void *mem = MALLOC(rand() % SMALL_ALLOC_MAX_SZ);
+		FREE(mem);
+		FREE(mem);
+	}
 	return 0;
 }

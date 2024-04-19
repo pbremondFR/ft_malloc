@@ -6,11 +6,12 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 20:23:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/17 15:48:41 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:51:59 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
+#include <stdbool.h>
 #include "libft.h"
 
 /*
@@ -90,4 +91,15 @@ void	tarace(const char * restrict fmt, ...)
 	(void)vsnprintf(buf, sizeof(buf), fmt, args);
 	ft_putstr(buf);
 	va_end(args);
+}
+
+void	malloc_error(const char * restrict msg, bool abort_program)
+{
+	(void)abort_program;	// Avoid unused warning if in mandatory mode
+	ft_putstr_fd("*** ft_malloc detected *** ", STDERR_FILENO);
+	ft_putstr_fd(msg, STDERR_FILENO);
+#ifdef FT_BONUS
+	if (abort_program)
+		abort();
+#endif
 }

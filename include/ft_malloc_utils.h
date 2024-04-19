@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/18 15:30:56 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 20:13:26 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void	rec_putnbr(int n);
 void	rec_putsize_t(size_t n);
 void	rec_putnbr_base(long n, const char *base);
 void	tarace(const char * restrict fmt, ...);
+void	malloc_error(const char * restrict msg, bool abort_program);
 
 void	malloc_load_options();
 t_heap	*create_new_heap(size_t heap_size);
