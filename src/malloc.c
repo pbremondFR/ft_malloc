@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/18 14:50:01 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:22:59 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,13 @@
 
 static bool	init_arenas(t_malloc_options const *options)
 {
-	ft_putstr(CYN"Init arenas"RESET"\n");
 	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 	// Other thread already init while we were waiting for mutex, skip it
 	if (g_malloc_internals.arenas.is_init == true)
+	{
+		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		return true;
+	}
 
 	t_heap *tiny_heap = create_new_heap(
 		(options->tiny_alloc_max_sz + sizeof(t_chunk)) * TINY_HEAP_MIN_ELEM);
@@ -34,7 +36,10 @@ static bool	init_arenas(t_malloc_options const *options)
 		(options->small_alloc_max_sz + sizeof(t_chunk)) * SMALL_HEAP_MIN_ELEM);
 
 	if (!tiny_heap || !small_heap)
+	{
+		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		return false;
+	}
 
 	g_malloc_internals.arenas.tiny_heaps = tiny_heap;
 	g_malloc_internals.arenas.small_heaps = small_heap;
@@ -61,8 +66,7 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 	head->next = chunk;
 }
 
-// TESTME
-/* static */ void	*malloc_tiny_or_small(t_heap **heaps, size_t req_size, size_t min_heap_size)
+static void	*malloc_tiny_or_small(t_heap **heaps, size_t req_size, size_t min_heap_size)
 {
 	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 	t_chunk *chunk = alloc_chunk_from_heaps(heaps, req_size, min_heap_size);
@@ -79,9 +83,6 @@ static void	insert_chunk_in_list(t_chunk **list, t_chunk *chunk)
 SHARED_LIB_EXPORT
 void	*MALLOC(size_t size)
 {
-	char buf[256] = {0};
-
-	// ft_putstr(GRN"+-------------\n|IN MALLOC"RESET"\n");
 	if (unlikely(g_malloc_internals.loaded_options == false))
 		malloc_load_options();
 	t_malloc_options options = g_malloc_internals.options;
@@ -93,7 +94,6 @@ void	*MALLOC(size_t size)
 
 	if (size > PTRDIFF_MAX)
 	{
-		dbg_print("|Bad size, enomem and shit\n");
 		errno = ENOMEM;
 		return NULL;
 	}
@@ -103,19 +103,13 @@ void	*MALLOC(size_t size)
 	}
 	else if (size <= (size_t)options.tiny_alloc_max_sz)
 	{
-		void *mem = malloc_tiny_or_small(&g_malloc_internals.arenas.tiny_heaps,
+		return malloc_tiny_or_small(&g_malloc_internals.arenas.tiny_heaps,
 			size, options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
-		snprintf(buf, sizeof(buf), "Returning tiny mem ptr %p (chunk %p)\n", mem, mem + 16);
-		ft_putstr(buf);
-		return mem;
 	}
 	else if (size <= (size_t)options.small_alloc_max_sz)
 	{
-		void *mem = malloc_tiny_or_small(&g_malloc_internals.arenas.small_heaps,
+		return malloc_tiny_or_small(&g_malloc_internals.arenas.small_heaps,
 			size, options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
-		snprintf(buf, sizeof(buf), "Returning small mem ptr %p (chunk %p)\n", mem, mem + 16);
-		ft_putstr(buf);
-		return mem;
 	}
 	else
 	{
@@ -126,11 +120,9 @@ void	*MALLOC(size_t size)
 			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (chunk == MAP_FAILED)
 		{
-			dbg_print("|BIG ASS ERROR\n");
 			errno = ENOMEM;
 			return NULL;
 		}
-		// chunk->prev_size = 0;
 		chunk->size = aligned_size;
 		chunk->size |= FLAG_CHUNK_MMAPPED;
 		chunk->next = NULL;
@@ -138,11 +130,8 @@ void	*MALLOC(size_t size)
 		pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
 		insert_chunk_in_list(&g_malloc_internals.arenas.big_allocs, chunk);
 		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
-		// ft_putstr(GRN"|OUT OF MALLOC\n+-------------"RESET"\n");
-		snprintf(buf, sizeof(buf), "Returning large mem ptr %p (chunk %p)\n", (char*)chunk + header_size, chunk);
-		ft_putstr(buf);
 		void *mem = (void*)chunk + header_size;
-		ft_bzero(mem, chunk_alloc_sz(chunk));
+		// ft_bzero(mem, chunk_alloc_sz(chunk));
 		return mem;
 	}
 }

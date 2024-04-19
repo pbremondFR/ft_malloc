@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 17:50:53 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/18 18:06:57 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 17:53:09 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,14 @@ static void	*copy_chunk_in_new_alloc(void *ptr, const t_chunk *chunk, size_t req
 	pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 	*released_mutex = true;
 	void *newptr = MALLOC(req_size);
-	size_t copy_len = req_size < chunk_alloc_sz(chunk) ? req_size : chunk_alloc_sz(chunk);
+	// From manual:
+	// "If realloc() fails, the original block is left untouched; it is not freed or moved"
 	if (newptr != NULL)
+	{
+		size_t copy_len = req_size < chunk_alloc_sz(chunk) ? req_size : chunk_alloc_sz(chunk);
 		ft_memcpy(newptr, ptr, copy_len);
-	FREE(ptr);
+		FREE(ptr);
+	}
 	return newptr;
 }
 

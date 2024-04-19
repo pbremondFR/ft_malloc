@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/18 18:05:11 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 17:17:42 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,28 +199,28 @@ int main()
 		FREE(foo);
 		FREE(bar);
 	}
-	// newtest();
-	// {
-	// 	void *tiny = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-	// 	SHOW_ALLOC_MEM();
-	// 	tiny = REALLOC(tiny, TINY_ALLOC_MAX_SZ);
-	// 	SHOW_ALLOC_MEM();
-	// 	FREE(tiny);
-	// }
-	// newtest();
-	// {
-	// 	void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-	// 	void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-	// 	void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-	// 	void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
-	// 	SHOW_ALLOC_MEM();
-	// 	FREE(tiny3);
-	// 	tiny2 = REALLOC(tiny2, TINY_ALLOC_MAX_SZ);
-	// 	SHOW_ALLOC_MEM();
-	// 	FREE(tiny1);
-	// 	FREE(tiny2);
-	// 	FREE(tiny4);
-	// }
+	newtest();
+	{
+		void *tiny = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		tiny = REALLOC(tiny, TINY_ALLOC_MAX_SZ);
+		SHOW_ALLOC_MEM();
+		FREE(tiny);
+	}
+	newtest();
+	{
+		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny2 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny3 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		void *tiny4 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
+		SHOW_ALLOC_MEM();
+		FREE(tiny3);
+		tiny2 = REALLOC(tiny2, TINY_ALLOC_MAX_SZ);
+		SHOW_ALLOC_MEM();
+		FREE(tiny1);
+		FREE(tiny2);
+		FREE(tiny4);
+	}
 	newtest();
 	{
 		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 4);
@@ -236,7 +236,7 @@ int main()
 		FREE(tiny2);
 		FREE(tiny4);
 	}
-	return 0;
+	// return 0;
 	newtest();
 	{
 		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
@@ -286,7 +286,7 @@ int main()
 		FREE(small2);
 		FREE(small3);
 	}
-	return 0;
+	// return 0;
 	newtest();
 	{
 		pthread_t	threads[8];

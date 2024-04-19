@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 21:53:41 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 18:47:49 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:23:39 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ static void override_malloc_options_from_env(t_malloc_options *options)
  */
 void	malloc_load_options()
 {
-	ft_putstr("Setting malloc options\n");
 	t_malloc_options old_options, new_options;
 
 	do

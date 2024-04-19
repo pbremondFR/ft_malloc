@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/18 14:29:00 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 17:47:22 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@
 
 static void	remove_large_chunk_from_list(t_chunk *chunk)
 {
-	// pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
-
 	t_chunk	*prev = g_malloc_internals.arenas.big_allocs;
 	while (prev != chunk && prev->next != NULL && prev->next != chunk)
 		prev = prev->next;
@@ -32,17 +30,10 @@ static void	remove_large_chunk_from_list(t_chunk *chunk)
 		g_malloc_internals.arenas.big_allocs = chunk->next;
 	else
 		prev->next = chunk->next;
-
-	// pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 }
 
 static void	free_chunk(t_chunk *chunk)
 {
-	bool collapsed_prev = false;
-	bool collapsed_next = false;
-	tarace("chunk: %p, chunk->next: %p, chunk size %zu (alloced %zu)\n",
-		chunk, chunk->next, chunk_sz(chunk), chunk_alloc_sz(chunk));
-
 	if (chunk_alloc_sz(chunk) > SMALL_ALLOC_MAX_SZ)
 	{
 		tarace(REDB"Fucking bad chunk alloc size (%zu), corrupted or something???"RESET"\n",
@@ -54,8 +45,6 @@ static void	free_chunk(t_chunk *chunk)
 	// dbg_print(BYEL"Freeing chunk"RESET"\n");
 	if (chunk->next && chunk->next->size & FLAG_CHUNK_FREE)
 	{
-		// dbg_print(YEL"Collapsing next chunk"RESET"\n");
-		collapsed_next = true;
 		size_t flags = chunk->size & ~CHUNK_SIZE_MASK;
 		chunk->size = (chunk_sz(chunk) + chunk_sz(chunk->next)) | flags;
 		chunk->next = chunk->next->next;
@@ -64,18 +53,18 @@ static void	free_chunk(t_chunk *chunk)
 	// Collapse previous chunk if it's free
 	if (chunk->size & FLAG_CHUNK_PREV_FREE)
 	{
-		// dbg_print(YEL"Collapsing previous chunk"RESET"\n");
 		const size_t *p_prev_size = (void*)chunk - sizeof(size_t);
 		const size_t prev_size = *p_prev_size;
 		if (prev_size == 0)
+		{
 			tarace(REDB"ptn zbi prev size is %zu"RESET"\n", prev_size);
-		tarace("prev size ptr is %p with value %zu (%#x)\n", p_prev_size, prev_size, prev_size);
+			abort();
+		}
 		t_chunk	*prev = (void*)chunk - prev_size;
 		// size_t flags = prev->size & ~CHUNK_SIZE_MASK;
 		prev->size = (chunk_sz(chunk) + chunk_sz(prev));
 		prev->next = chunk->next;
 		chunk = prev;
-		collapsed_prev = true;
 	}
 
 	chunk->size |= FLAG_CHUNK_FREE;
@@ -83,8 +72,6 @@ static void	free_chunk(t_chunk *chunk)
 		chunk->next->size |= FLAG_CHUNK_PREV_FREE;
 
 	size_t *trailing_size_tag = (void*)chunk + chunk_sz(chunk) - sizeof(size_t);
-	tarace("Collapsed %d/%d, chunk: %p, chunk size: %zu(%#lx), trailing size tag: %p\n",
-		collapsed_prev, collapsed_next, chunk, chunk_sz(chunk), chunk_sz(chunk), trailing_size_tag);
 	*trailing_size_tag = chunk_sz(chunk);
 }
 
@@ -96,29 +83,16 @@ static void	free_chunk(t_chunk *chunk)
 SHARED_LIB_EXPORT
 void	FREE(void *ptr)
 {
-	// ft_putstr(YEL"IN FREE"RESET"\n");
-	const uintptr_t	pagesize = getpagesize();
-	char buf[256];
-	snprintf(buf, sizeof(buf), "Pagesize: %zu, as ptr: %p\n", pagesize, (void*)pagesize);
-	// ft_putstr(buf);
-	if ((size_t)ptr < 0x100000ull && ptr != NULL)
-		tarace(REDB"ALL FUCKED UP"RESET"\n");
-
-	// t_chunk *chunk = ptr - ALIGN_MALLOC(sizeof(t_chunk));
 	// Replace the above line with this for debug, move it below when I'm done
-	t_chunk *chunk = ptr - (ptr == NULL ? 0 : ALIGN_MALLOC(sizeof(t_chunk)));
-	tarace("Freeing %p (chunk %p)\n", ptr, chunk);
-	if ((size_t)ptr < pagesize)
-	// if (ptr == NULL)
-	{
-		if (ptr != NULL) {
-			ft_putstr(REDB"CORRUPTED MEMORY OH NO"RESET"\n");
-			ft_putstr_fd(REDB"CORRUPTED MEMORY OH NO"RESET"\n", 2);
-		}
+	if (ptr == NULL)
 		return;
-	}
 	pthread_mutex_lock(&g_malloc_internals.arenas.mutex);
-
+	t_chunk *chunk = ptr - ALIGN_MALLOC(sizeof(t_chunk));
+	if (chunk->size & FLAG_CHUNK_FREE)
+	{
+		tarace(REDB"CORRUPTED, DOUBLE FREE %p\n"RESET, chunk);
+		abort();
+	}
 	if (chunk->size & FLAG_CHUNK_MMAPPED)
 	{
 		remove_large_chunk_from_list(chunk);
@@ -131,5 +105,4 @@ void	FREE(void *ptr)
 		free_chunk(chunk);
 	}
 	pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
-	// dbg_print(YEL"OUT OF FREE"RESET"\n");
 }

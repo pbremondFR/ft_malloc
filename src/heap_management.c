@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/18 17:05:54 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:11:01 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,21 +144,11 @@ t_chunk	*find_best_chunk_for_alloc(t_heap const *heaps, size_t req_size)
 
 void	try_shrink_chunk_for_requested_size(t_chunk *chunk, size_t req_size)
 {
-	char buf[128];
 	size_t new_size = ALIGN_MALLOC(req_size + sizeof(t_chunk));
 	// If new chunk size doesn't leave enough the minimum amount of space for next chunk,
 	// do nothing
 	if (chunk_sz(chunk) - new_size < ALIGN_MALLOC(sizeof(t_chunk) + MALLOC_ALIGNMENT))
-	{
-		snprintf(buf, sizeof(buf), BLUHB"Can't shrink chunk"RESET"\n"BLUHB"Chunk size: %zu, req_size: %zu"RESET"\n", chunk_sz(chunk), req_size);
-		ft_putstr(buf);
 		return;
-	}
-	else
-	{
-		snprintf(buf, sizeof(buf), GRNHB"Shrinking chunk"RESET"\n"GRNHB"Chunk size: %zu, req_size: %zu"RESET"\n", chunk_sz(chunk), req_size);
-		ft_putstr(buf);
-	}
 
 	// Else, divide chunk
 	t_chunk *new_next_chunk = (void*)chunk + new_size;
@@ -180,7 +170,6 @@ t_chunk	*alloc_chunk_from_heaps(t_heap **heap_lst, size_t req_size, size_t new_h
 	t_chunk *selected_chunk = find_best_chunk_for_alloc(*heap_lst, req_size);
 	if (selected_chunk == NULL)
 	{
-		ft_putstr(RED"No good free chunk, inserting new heap"RESET"\n");
 		t_heap *new_heap = create_new_heap(new_heap_min_sz);
 		if (!new_heap)
 			return NULL;
