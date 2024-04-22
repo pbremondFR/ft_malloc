@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 20:27:18 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 18:00:41 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,6 @@ static void	newtest(void)
 	ft_putstr(buf);
 }
 
-static void	print_settings()
-{
-	dbg_print("Page size: %d, %ld\n", getpagesize(), sysconf(_SC_PAGESIZE));
-	dbg_print("Malloc alignment: %zu\n", MALLOC_ALIGNMENT);
-}
-
 static void	*routine(void *param)
 {
 	(void)param;
@@ -71,10 +65,6 @@ static void	*routine(void *param)
 	void *mem_small = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
 	void *mem_large = MALLOC(SMALL_ALLOC_MAX_SZ * 2);
 	sleep(2);
-
-	char buf[128] = {0};
-	snprintf(buf, sizeof(buf), "### Tiny: %p, Small: %p, Large: %p\n", mem_tiny, mem_small, mem_large);
-	ft_putstr(buf);
 
 	FREE(mem_tiny);
 	FREE(mem_small);
@@ -86,8 +76,6 @@ static void	*routine(void *param)
 int main()
 {
 	srand(time(NULL));
-
-	print_settings();
 
 	newtest();
 	{
@@ -105,7 +93,6 @@ int main()
 		SHOW_ALLOC_MEM();
 		FREE(tiny1);
 		SHOW_ALLOC_MEM();
-		dbg_print(CYNHB"Last free"RESET"\n");
 		FREE(tiny5);
 		SHOW_ALLOC_MEM();
 	}
@@ -149,12 +136,14 @@ int main()
 	}
 	newtest();
 	{
+		SHOW_ALLOC_MEM();
 		void *mem[SMALL_HEAP_MIN_ELEM * 8];
 		for (size_t i = 0; i < SIZEOF_ARRAY(mem); ++i)
 			mem[i] = MALLOC(SMALL_ALLOC_MAX_SZ);
+		SHOW_ALLOC_MEM();
 		for (size_t i = 0; i < SIZEOF_ARRAY(mem); ++i)
 			FREE(mem[i]);
-		show_alloc_mem();
+		SHOW_ALLOC_MEM();
 	}
 	newtest();
 	{
@@ -237,7 +226,6 @@ int main()
 		FREE(tiny2);
 		FREE(tiny4);
 	}
-	// return 0;
 	newtest();
 	{
 		void *tiny1 = MALLOC(TINY_ALLOC_MAX_SZ / 2);
@@ -317,10 +305,8 @@ int main()
 	SHOW_ALLOC_MEM();
 	newtest();
 	{
-		// If you alloc more than that, page will certainly be unmapped and
-		// you WILL segfault. This gives you a chance to hit a mapped page
-		// and hit the double free warning instead.
-		void *mem = MALLOC(rand() % SMALL_ALLOC_MAX_SZ);
+		// Trigger double free error
+		void *mem = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
 		FREE(mem);
 		FREE(mem);
 	}

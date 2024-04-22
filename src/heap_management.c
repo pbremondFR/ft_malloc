@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 20:26:51 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 17:55:13 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ t_heap	*create_new_heap(size_t size)
 	t_heap *heap = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	heap->size = aligned_size;
 	// heap->next = NULL;	// Optional, mmap zero inits everything
-	heap->chunks = (t_chunk*)ALIGN_MALLOC(heap + 1);	// Chunks start after heap header, correctly aligned
+	heap->chunks = (t_chunk*)ALIGN_MALLOC((void*)heap + sizeof(t_heap));	// Chunks start after heap header, correctly aligned
 	// heap->chunks->prev_size = 0;
 	heap->chunks->size = aligned_size - ((char*)heap->chunks - (char*)heap);
 	heap->chunks->size |= FLAG_CHUNK_FREE;
@@ -40,15 +40,11 @@ t_heap	*create_new_heap(size_t size)
 }
 
 /*
- * Insert a new t_heap in the linked list, in ascending order. If heap is directly adjacent
- * to the t_heap directly before or after (i.e. two pages are adjacent),
- * fuse these heaps together to avoid fragmentation
+ * Insert a new t_heap in the linked list, in ascending order.
  */
 void	insert_heap_in_list(t_heap **list, t_heap *new_heap)
 {
 	assert(*list != NULL);
-	t_heap	*prev = NULL;
-	size_t	page_size = getpagesize();
 
 	// Do a sorted insert in the heap list
 	if (*list > new_heap)
@@ -63,43 +59,24 @@ void	insert_heap_in_list(t_heap **list, t_heap *new_heap)
 			head = head->next;
 		new_heap->next = head->next;
 		head->next = new_heap;
-		prev = head;
 	}
+}
 
-	// char buf[256];
-	// snprintf(buf, sizeof(buf), GRN
-	// 	"page_size:      %#14lx\n"
-	// 	"new_heap->size: %#14lx\n"
-	// 	"prev:           %p\n"
-	// 	"new_heap:       %p\n"
-	// 	"new_heap->next: %p\n"RESET,
-	// 	page_size, new_heap->size, prev, new_heap, new_heap->next);
-	// ft_putstr(buf);
-	// size_t prev_size = prev ? prev->size : 0;
-	// snprintf(buf, sizeof(buf), BLU
-	// 	"new + size:     %p\n"
-	// 	"prev + size:    %p\n"RESET,
-	// 	(void*)ALIGN_TO((char*)new_heap + new_heap->size, page_size),
-	// 	(void*)ALIGN_TO((char*)prev + prev_size, page_size));
-	// ft_putstr(buf);
+/*
+ * Removes a heap from the linked list. Mustn't and can't remove the first chunk in the
+ * list, so there is always at least one heap to allocate from
+ */
+void	remove_heap_from_list(t_heap *heap_lst, t_heap const *target)
+{
+	assert(heap_lst != NULL && target != NULL);
+	assert(heap_lst != g_malloc_internals.arenas.tiny_heaps
+		&& target != g_malloc_internals.arenas.small_heaps);
 
-	// TESTME: Optimization never kicks in on WSL so I can't test it, try it at school
-	// Next is immediately adjacent, fuse the two t_heaps together
-	// FIXME: Shitty optimization, worked but makes reclaiming heaps much harder
-	// Just remove it and reclaim heaps manually after that
-	if ((void*)ALIGN_TO((char*)new_heap + new_heap->size, page_size) == new_heap->next)
-	{
-		ft_putstr("Salut c'est David Lafarge\n");
-		new_heap->size += new_heap->next->size;
-		new_heap->next = new_heap->next->next;
-	}
-	// Previous is immediately adjacent, fuse them together
-	if (prev && (void*)ALIGN_TO((char*)prev + prev->size, page_size) == new_heap)
-	{
-		ft_putstr("Salut c'est Lavid Dafarge\n");
-		prev->size += new_heap->size;
-		prev->next = new_heap->next;
-	}
+	t_heap *prev = heap_lst;
+	while (prev->next && prev->next != target)
+		prev = prev->next;
+
+	prev->next = target->next;
 }
 
 /*

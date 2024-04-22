@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 15:18:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 20:13:26 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 16:30:11 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	malloc_error(const char * restrict msg, bool abort_program);
 void	malloc_load_options();
 t_heap	*create_new_heap(size_t heap_size);
 void	insert_heap_in_list(t_heap **list, t_heap *new_heap);
+void	remove_heap_from_list(t_heap *heap_lst, t_heap const *target);
 
 t_chunk	*find_best_chunk_for_alloc(t_heap const *heaps, size_t req_size);
 t_chunk	*alloc_chunk_from_heaps(t_heap **heap_lst, size_t req_size, size_t new_heap_min_sz);

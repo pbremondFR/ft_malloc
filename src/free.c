@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 20:08:43 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 17:51:05 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ static void	remove_large_chunk_from_list(t_chunk *chunk)
 		prev->next = chunk->next;
 }
 
-static void	free_chunk(t_chunk *chunk, t_malloc_options const *opt)
+static t_chunk	*free_chunk(t_chunk *chunk, t_malloc_options const *opt)
 {
 	if (opt->check_errors && chunk_alloc_sz(chunk) > SMALL_ALLOC_MAX_SZ)
 	{
 		malloc_error("Free'd chunk has incoherent alloc size, possible heap corruption\n",
 			opt->check_errors & 0x2);
-		return;
+		return NULL;
 	}
 
 	// Collapse next chunk with currently free'd chunk
@@ -71,6 +71,7 @@ static void	free_chunk(t_chunk *chunk, t_malloc_options const *opt)
 
 	size_t *trailing_size_tag = (void*)chunk + chunk_sz(chunk) - sizeof(size_t);
 	*trailing_size_tag = chunk_sz(chunk);
+	return chunk;
 }
 
 SHARED_LIB_EXPORT
@@ -96,7 +97,24 @@ void	FREE(void *ptr)
 	}
 	else
 	{
-		free_chunk(chunk, &opt);
+		size_t alloc_sz = chunk_alloc_sz(chunk);
+		t_chunk *freed = free_chunk(chunk, &opt);
+		if (likely(freed))
+		{
+			t_heap *heap_head = alloc_sz <= (size_t)opt.tiny_alloc_max_sz
+				? g_malloc_internals.arenas.tiny_heaps
+				: g_malloc_internals.arenas.small_heaps;
+			size_t empty_heap_chunk_sz = heap_head->size
+				- ALIGN_MALLOC(sizeof(t_heap));
+			if (chunk_sz(freed) == empty_heap_chunk_sz && heap_head->next)
+			{
+				t_heap *target = (void*)freed - ALIGN_MALLOC(sizeof(t_heap));
+				remove_heap_from_list(heap_head, target);
+				if (munmap(target, target->size) != 0) {
+					malloc_error("Failed to unmap arena\n", opt.check_errors & 0x2);
+				}
+			}
+		}
 	}
 	pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 }
