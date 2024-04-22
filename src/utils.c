@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 20:23:25 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 18:51:59 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 18:49:05 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ void	rec_putnbr_base(long nbr, const char *base)
 }
 #pragma GCC diagnostic pop
 
+#ifndef NDEBUG
+
 void	tarace(const char * restrict fmt, ...)
 {
 	char buf[1024] = {0};
@@ -92,6 +94,8 @@ void	tarace(const char * restrict fmt, ...)
 	ft_putstr(buf);
 	va_end(args);
 }
+
+#endif
 
 void	malloc_error(const char * restrict msg, bool abort_program)
 {

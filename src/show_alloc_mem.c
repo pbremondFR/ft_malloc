@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 19:23:02 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/10 21:13:49 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 18:17:33 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 
 static size_t	print_allocs_from_heaps(t_heap const *heaps_list)
 {
-	char	buf[128] = {0};
 	size_t	sum = 0;
 
 	while (heaps_list)
@@ -30,8 +29,9 @@ static size_t	print_allocs_from_heaps(t_heap const *heaps_list)
 			const void *mem = (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
 			size_t size = chunk_alloc_sz(chunk);
 			sum += size;
-			snprintf(buf, sizeof(buf), "%p - %p : %zu bytes\n", mem, mem + size, size);
-			ft_putstr(buf);
+			ft_putstr("0x"); rec_putnbr_base((long)mem, BASE_HEXA_LOWER); ft_putstr(" - 0x");
+			rec_putnbr_base((long)mem + size, BASE_HEXA_LOWER); ft_putstr(" : ");
+			rec_putsize_t(size); ft_putstr(" bytes\n");
 		}
 		heaps_list = heaps_list->next;
 	}

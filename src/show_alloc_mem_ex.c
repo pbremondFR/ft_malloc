@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/09 19:31:33 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/17 16:45:04 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 18:55:24 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,25 @@
 #include "libft.h"
 #include "ansi_color.h"
 
+static void	fuck_you_for_not_allowing_printf_im_not_recoding_it_again(const char * restrict colour,
+	const void *mem, size_t size)
+{
+	ft_putstr(colour);
+	ft_putstr("0x"); rec_putnbr_base((long)mem, BASE_HEXA_LOWER); ft_putstr(" - 0x");
+	rec_putnbr_base((long)mem + size, BASE_HEXA_LOWER); ft_putstr(" : ");
+	rec_putsize_t(size); ft_putstr(" bytes\n");
+	ft_putstr(RESET);
+}
+
 static size_t	print_allocs_from_heaps(t_heap const *heaps_list)
 {
-	char	buf[128] = {0};
-	size_t	sum = 0;
+	size_t		sum = 0;
+	const char	*percent_color[] = {RED, RED, YEL, YEL, YEL, GRN, GRN, GRN, GRN, GRN, GRN};
 
 	while (heaps_list)
 	{
+		size_t avail = 0;
+
 		for (t_chunk const *chunk = heaps_list->chunks;
 			chunk && (char*)chunk < (char*)heaps_list + heaps_list->size;
 			chunk = chunk->next)
@@ -30,14 +42,22 @@ static size_t	print_allocs_from_heaps(t_heap const *heaps_list)
 			const void *mem = (char*)chunk + ALIGN_MALLOC(sizeof(t_chunk));
 			size_t size = chunk_alloc_sz(chunk);
 			if (is_free)
-				snprintf(buf, sizeof(buf), YEL"%p - %p : %zu bytes"RESET"\n", mem, mem + size, size);
+			{
+				fuck_you_for_not_allowing_printf_im_not_recoding_it_again(YEL, mem, size);
+				avail += size;
+			}
 			else
 			{
-				snprintf(buf, sizeof(buf), GRN"%p - %p : %zu bytes"RESET"\n", mem, mem + size, size);
+				fuck_you_for_not_allowing_printf_im_not_recoding_it_again(GRN, mem, size);
 				sum += size;
 			}
-			ft_putstr(buf);
 		}
+		size_t heap_total_sz = heaps_list->size - ALIGN_MALLOC(sizeof(t_heap)) - sizeof(t_chunk);
+		size_t percent_avail = avail / (heap_total_sz / 100);
+		ft_putstr(percent_color[percent_avail / 10]);
+		rec_putsize_t(percent_avail);
+		ft_putstr("%"RESET" of heap available\n");
+
 		heaps_list = heaps_list->next;
 	}
 	return sum;
@@ -45,7 +65,6 @@ static size_t	print_allocs_from_heaps(t_heap const *heaps_list)
 
 static size_t	print_large_allocs(const t_chunk *chunks)
 {
-	char	buf[256] = {0};
 	size_t	sum = 0;
 
 	ft_putstr("LARGE:\n");
@@ -54,8 +73,7 @@ static size_t	print_large_allocs(const t_chunk *chunks)
 		const void *mem = (char*)chunks + sizeof(t_chunk);
 		size_t size = chunk_alloc_sz(chunks);
 		sum += size;
-		snprintf(buf, sizeof(buf), "%p - %p : %zu bytes\n", mem, mem + size, size);
-		ft_putstr(buf);
+		fuck_you_for_not_allowing_printf_im_not_recoding_it_again(RESET, mem, size);
 	}
 	return sum;
 }
@@ -63,7 +81,6 @@ static size_t	print_large_allocs(const t_chunk *chunks)
 SHARED_LIB_EXPORT
 void	show_alloc_mem_ex()
 {
-	char	buf[256] = {0};
 	size_t	sum = 0;
 
 	t_malloc_arenas *arenas = &g_malloc_internals.arenas;
@@ -76,6 +93,5 @@ void	show_alloc_mem_ex()
 	sum += print_large_allocs(arenas->big_allocs);
 	pthread_mutex_unlock(&arenas->mutex);
 
-	snprintf(buf, sizeof(buf), "Total: %zu\n", sum);
-	ft_putstr(buf);
+	ft_putstr("Total: "); rec_putsize_t(sum); ft_putstr(" bytes\n");
 }

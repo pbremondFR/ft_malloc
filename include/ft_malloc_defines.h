@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 21:34:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/03/06 17:41:18 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 18:15:57 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,5 +42,11 @@
 # else
 #  define dbg_print(...)
 # endif
+
+# ifndef FT_BONUS
+#  define SHOW_ALLOC_MEM show_alloc_mem
+# else
+#  define SHOW_ALLOC_MEM show_alloc_mem_ex
+#endif
 
 #endif

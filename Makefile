@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/04/19 20:16:11 by pbremond         ###   ########.fr        #
+#    Updated: 2024/04/22 19:03:35 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,7 +47,7 @@ INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
 TEST_DIR = tester
 
-CC = gcc
+CC = clang
 CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc -fvisibility=hidden -march=native $(INCLUDES)
 
 LIBFT := libft.a
@@ -63,10 +63,9 @@ ifdef BUILD_DEBUG
 	TGT_DIR := debug
 	CFLAGS += -gdwarf-4 -Og -fno-omit-frame-pointer
 	LIBFT_BUILD_ARGS += BUILD_DEBUG=1
-	CPPFLAGS += -DNDEBUG
 	ifndef VALGRIND
-		# CFLAGS += -fsanitize=undefined
-		# LDFLAGS += -fsanitize=undefined
+		CFLAGS += -fsanitize=undefined
+		LDFLAGS += -fsanitize=undefined
 	endif
 else
 	OBJ_DIR := objs

@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:56:44 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/22 18:00:41 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/22 18:55:09 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,6 @@
 #include <stdbool.h>
 
 #include <pthread.h>
-
-// #define SHOW_ALLOC_MEM show_alloc_mem
-#define SHOW_ALLOC_MEM show_alloc_mem_ex
 
 __attribute__((unused))
 static void	do_static_asserts()
@@ -124,9 +121,6 @@ int main()
 		void *small2 = MALLOC(SMALL_ALLOC_MAX_SZ / 2);
 		void *large2 = MALLOC(SMALL_ALLOC_MAX_SZ * 2);
 		show_alloc_mem();
-		printf("Tiny 1:  %p, Tiny 2:  %p\n", tiny1, tiny2);
-		printf("Small 1: %p, Small 2: %p\n", small1, small2);
-		printf("Large 1: %p, Large 2: %p\n", large1, large2);
 		FREE(tiny1);
 		FREE(tiny2);
 		FREE(small1);
