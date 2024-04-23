@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 21:53:41 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/22 18:58:20 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/23 11:23:42 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static bool	valid_options(t_malloc_options const* options)
 		&& options->small_alloc_max_sz > options->tiny_alloc_max_sz)
 		&& (options->tiny_alloc_max_sz > 0);
 }
-#include "ft_malloc_utils.h"
+
 static void override_malloc_options_from_env(t_malloc_options *options)
 {
 	typedef struct { const char *key; int *value; } kv_pair;
