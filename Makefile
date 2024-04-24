@@ -6,7 +6,7 @@
 #    By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/25 15:25:19 by pbremond          #+#    #+#              #
-#    Updated: 2024/04/22 19:03:35 by pbremond         ###   ########.fr        #
+#    Updated: 2024/04/24 16:05:46 by pbremond         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,13 +47,15 @@ INCLUDES = -I./include -I./libft/include
 SRC_DIR = src
 TEST_DIR = tester
 
-CC = clang
+# CC = clang
 CFLAGS := -Wall -Wextra -std=gnu17 -fno-builtin-malloc -fvisibility=hidden -march=native $(INCLUDES)
 
 LIBFT := libft.a
 LIBFT_PATH := libft
 
-LDFLAGS := -L./$(LIBFT_PATH) -L.
+# Link with libft, libpthread and libatomic, but don't export their symbols
+# This way you only keep madatory project functions exported in the .so
+LDFLAGS := -L./$(LIBFT_PATH) -L. -Wl,--exclude-libs,ALL
 LDLIBS := -lft -lpthread -latomic
 
 LIBFT_BUILD_ARGS := CFLAGS=-std=gnu17 CC=$(CC)
