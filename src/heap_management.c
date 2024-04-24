@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/22 17:55:13 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/24 15:23:01 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ static t_chunk	*find_first_free_chunk_in_heap(t_heap const *heap)
 		if (chunk->size & FLAG_CHUNK_FREE)
 			return chunk;
 		else
-			chunk = (t_chunk*)((char*)chunk + chunk_sz(chunk));
+			chunk = chunk->next;
 	}
 	return NULL;
 }

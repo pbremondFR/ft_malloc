@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/19 20:17:30 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/24 15:02:38 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,12 +104,12 @@ void	*MALLOC(size_t size)
 	else if (size <= (size_t)options.tiny_alloc_max_sz)
 	{
 		return malloc_tiny_or_small(&g_malloc_internals.arenas.tiny_heaps,
-			size, options.tiny_alloc_max_sz * TINY_HEAP_MIN_ELEM);
+			size, (options.tiny_alloc_max_sz + sizeof(t_chunk)) * TINY_HEAP_MIN_ELEM);
 	}
 	else if (size <= (size_t)options.small_alloc_max_sz)
 	{
 		return malloc_tiny_or_small(&g_malloc_internals.arenas.small_heaps,
-			size, options.small_alloc_max_sz * SMALL_HEAP_MIN_ELEM);
+			size, (options.small_alloc_max_sz + sizeof(t_chunk)) * SMALL_HEAP_MIN_ELEM);
 	}
 	else
 	{

@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 21:34:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/22 18:15:57 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/04/24 15:24:02 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,10 @@
 # define ALIGN_MALLOC(x)	ALIGN_TO(x, MALLOC_ALIGNMENT)
 
 # define TINY_ALLOC_MAX_SZ		128
-# define TINY_HEAP_MIN_ELEM		100
-// See M_MMAP_THRESHOLD
-// # define SMALL_ALLOC_MAX_SZ	128 * 1024
-# define SMALL_ALLOC_MAX_SZ		512
-# define SMALL_HEAP_MIN_ELEM	100
+# define TINY_HEAP_MIN_ELEM		128
+// See M_MMAP_THRESHOLD, is by default 128 * 1024
+# define SMALL_ALLOC_MAX_SZ		(128 * 1024)
+# define SMALL_HEAP_MIN_ELEM	128
 
 # define NUM_ARENAS			16
 
