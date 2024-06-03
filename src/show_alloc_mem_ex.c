@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/09 19:31:33 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/22 18:55:24 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/06/03 18:43:53 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,42 @@
 #include "ansi_color.h"
 
 static void	fuck_you_for_not_allowing_printf_im_not_recoding_it_again(const char * restrict colour,
-	const void *mem, size_t size)
+	const void *mem, size_t size, bool do_hexdump)
 {
 	ft_putstr(colour);
 	ft_putstr("0x"); rec_putnbr_base((long)mem, BASE_HEXA_LOWER); ft_putstr(" - 0x");
 	rec_putnbr_base((long)mem + size, BASE_HEXA_LOWER); ft_putstr(" : ");
 	rec_putsize_t(size); ft_putstr(" bytes\n");
 	ft_putstr(RESET);
+
+	// This is all, without a doubt, some of the ugliest piece of shit code I've written in a while.
+	if (do_hexdump)
+	{
+		const unsigned char *mem_bytes = mem;
+		char ascii_view[20] = "|0123456789abcdef|\n";
+		for (size_t i = 0; i < size; ++i)
+		{
+			if (mem_bytes[i] <= 0x0f)
+				ft_putchar('0');
+			rec_putnbr_base(mem_bytes[i], BASE_HEXA_LOWER);
+			ft_putchar(' ');
+			if ((i + 1) % 8 == 0)
+				ft_putchar(' ');
+			if ((i + 1) % 16 == 0)
+			{
+				ft_memcpy(ascii_view + 1, &mem_bytes[i - 15], 16);
+				for (unsigned int j = 1; j < 18; ++j)
+				{
+					if (!ft_isprint(ascii_view[j]))
+						ascii_view[j] = '.';
+				}
+				ft_putstr(ascii_view);
+			}
+		}
+	}
 }
 
-static size_t	print_allocs_from_heaps(t_heap const *heaps_list)
+static size_t	print_allocs_from_heaps(t_heap const *heaps_list, bool do_hexdump)
 {
 	size_t		sum = 0;
 	const char	*percent_color[] = {RED, RED, YEL, YEL, YEL, GRN, GRN, GRN, GRN, GRN, GRN};
@@ -43,12 +69,12 @@ static size_t	print_allocs_from_heaps(t_heap const *heaps_list)
 			size_t size = chunk_alloc_sz(chunk);
 			if (is_free)
 			{
-				fuck_you_for_not_allowing_printf_im_not_recoding_it_again(YEL, mem, size);
+				fuck_you_for_not_allowing_printf_im_not_recoding_it_again(YEL, mem, size, false);
 				avail += size;
 			}
 			else
 			{
-				fuck_you_for_not_allowing_printf_im_not_recoding_it_again(GRN, mem, size);
+				fuck_you_for_not_allowing_printf_im_not_recoding_it_again(GRN, mem, size, do_hexdump);
 				sum += size;
 			}
 		}
@@ -73,7 +99,7 @@ static size_t	print_large_allocs(const t_chunk *chunks)
 		const void *mem = (char*)chunks + sizeof(t_chunk);
 		size_t size = chunk_alloc_sz(chunks);
 		sum += size;
-		fuck_you_for_not_allowing_printf_im_not_recoding_it_again(RESET, mem, size);
+		fuck_you_for_not_allowing_printf_im_not_recoding_it_again(RESET, mem, size, false);
 	}
 	return sum;
 }
@@ -87,9 +113,9 @@ void	show_alloc_mem_ex()
 
 	pthread_mutex_lock(&arenas->mutex);
 	ft_putstr("TINY:\n");
-	sum += print_allocs_from_heaps(arenas->tiny_heaps);
+	sum += print_allocs_from_heaps(arenas->tiny_heaps, true);
 	ft_putstr("SMALL:\n");
-	sum += print_allocs_from_heaps(arenas->small_heaps);
+	sum += print_allocs_from_heaps(arenas->small_heaps, false);
 	sum += print_large_allocs(arenas->big_allocs);
 	pthread_mutex_unlock(&arenas->mutex);
 
