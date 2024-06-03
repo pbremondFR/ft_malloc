@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/08 02:36:28 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/24 15:23:01 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/06/03 17:56:29 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ t_heap	*create_new_heap(size_t size)
 	const size_t aligned_size = ALIGN_TO(size + sizeof(t_heap), getpagesize());
 
 	t_heap *heap = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (!heap)
+		return NULL;
 	heap->size = aligned_size;
 	// heap->next = NULL;	// Optional, mmap zero inits everything
 	heap->chunks = (t_chunk*)ALIGN_MALLOC((void*)heap + sizeof(t_heap));	// Chunks start after heap header, correctly aligned

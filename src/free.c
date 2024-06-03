@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 16:32:51 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/22 17:51:05 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/06/03 18:11:10 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "ft_malloc_defines.h"
 #include "ft_malloc_utils.h"
 #include <sys/mman.h>
+#include <errno.h>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -55,14 +56,16 @@ static t_chunk	*free_chunk(t_chunk *chunk, t_malloc_options const *opt)
 		const size_t *p_prev_size = (void*)chunk - sizeof(size_t);
 		const size_t prev_size = *p_prev_size;
 		if (opt->check_errors && prev_size == 0)
-		{
+		{	// Don't immediately fail, just give up on coalescing the previous chunk
 			malloc_error("Chunk's previous size data is corrupted\n", opt->check_errors & 0x2);
 		}
-		t_chunk	*prev = (void*)chunk - prev_size;
-		// size_t flags = prev->size & ~CHUNK_SIZE_MASK;
-		prev->size = (chunk_sz(chunk) + chunk_sz(prev));
-		prev->next = chunk->next;
-		chunk = prev;
+		else
+		{
+			t_chunk	*prev = (void*)chunk - prev_size;
+			prev->size = (chunk_sz(chunk) + chunk_sz(prev));
+			prev->next = chunk->next;
+			chunk = prev;
+		}
 	}
 
 	chunk->size |= FLAG_CHUNK_FREE;
@@ -80,6 +83,7 @@ void	FREE(void *ptr)
 	// Replace the above line with this for debug, move it below when I'm done
 	if (ptr == NULL)
 		return;
+	const int preserved_errno = errno;
 	const t_malloc_options opt = g_malloc_internals.options;
 	t_chunk *chunk = ptr - ALIGN_MALLOC(sizeof(t_chunk));
 
@@ -87,13 +91,13 @@ void	FREE(void *ptr)
 	if (opt.check_errors && chunk->size & FLAG_CHUNK_FREE)
 	{
 		malloc_error("Double free\n", opt.check_errors & 0x2);
-		return;
+		goto unlock_and_exit;
 	}
 	if (chunk->size & FLAG_CHUNK_MMAPPED)
 	{
 		remove_large_chunk_from_list(chunk);
 		if (munmap(chunk, chunk_sz(chunk)) != 0)
-			malloc_error("munmap() call failed, likely due to heap corruption\n", false);
+			malloc_error("munmap() call failed, likely due to heap corruption\n", opt.check_errors & 0x2);
 	}
 	else
 	{
@@ -116,5 +120,9 @@ void	FREE(void *ptr)
 			}
 		}
 	}
+
+unlock_and_exit:
 	pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
+	errno = preserved_errno;
+	return;
 }

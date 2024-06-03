@@ -6,7 +6,7 @@
 /*   By: pbremond <pbremond@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/28 13:16:31 by pbremond          #+#    #+#             */
-/*   Updated: 2024/04/24 15:02:38 by pbremond         ###   ########.fr       */
+/*   Updated: 2024/06/03 18:07:29 by pbremond         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "libft.h"
 #include "ansi_color.h"
 #include <errno.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <stdbool.h>
 
@@ -37,6 +38,15 @@ static bool	init_arenas(t_malloc_options const *options)
 
 	if (!tiny_heap || !small_heap)
 	{
+#ifdef FT_BONUS
+		char msg[128] = "Failed to initialize arenas with mmap: ";
+		ft_strlcpy(msg, strerror(errno), sizeof(msg));
+		malloc_error(msg, options->check_errors & 0x2);
+#endif
+		if (tiny_heap)
+			munmap(tiny_heap, tiny_heap->size);
+		if (small_heap)
+			munmap(small_heap, small_heap->size);
 		pthread_mutex_unlock(&g_malloc_internals.arenas.mutex);
 		return false;
 	}
